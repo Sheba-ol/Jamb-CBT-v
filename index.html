@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0a0e1a"/>
+<title>JAMB CBT Pro</title>
+<link rel="manifest" href="data:application/json,{}"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;--card:#0f1829;--card2:#111e35;
+  --blue:#2563eb;--blue2:#3b82f6;--blue3:#60a5fa;
+  --purple:#7c3aed;--green:#22c55e;--red:#ef4444;
+  --yellow:#eab308;--text:#e2e8f0;--muted:#94a3b8;--dim:#64748b;
+  --border:rgba(30,64,175,0.3);
+}
+body{background:var(--bg);color:var(--text);font-family:'Georgia',serif;min-height:100vh;overflow-x:hidden}
+button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;outline:none}
+button:active{transform:scale(.97)}
+a{color:var(--blue3);text-decoration:none}
+.screen{min-height:100vh;display:none;flex-direction:column}
+.screen.active{display:flex}
+/* NAV */
+.nav{background:rgba(10,14,26,.95);border-bottom:2px solid var(--blue);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.nav-logo{font-size:1.2rem;font-weight:800;color:var(--blue3);letter-spacing:-.5px}
+.nav-title{color:var(--muted);font-size:.85rem;margin-left:8px}
+.nav-left{display:flex;align-items:center;gap:8px}
+.nav-right{display:flex;gap:8px}
+.back-btn{background:none;color:var(--blue3);font-size:1.4rem;padding:0 8px 0 0}
+/* BUTTONS */
+.btn{padding:10px 20px;border-radius:8px;font-weight:700;font-size:.9rem;color:#fff}
+.btn-primary{background:var(--blue)}
+.btn-purple{background:var(--purple)}
+.btn-outline{background:transparent;color:var(--blue3);border:1.5px solid var(--blue3)!important;border-radius:8px;padding:10px 20px;font-weight:700;font-size:.9rem}
+.btn-danger{background:var(--red)}
+.btn-green{background:#15803d}
+.btn-block{width:100%;padding:14px;font-size:1rem}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px}
+.card:hover{border-color:var(--blue2)}
+/* CONTAINER */
+.container{max-width:700px;margin:0 auto;padding:24px 16px}
+.container-sm{max-width:580px;margin:0 auto;padding:24px 16px}
+/* HOME */
+.home-hero{text-align:center;padding:32px 0 24px}
+.hero-title{font-size:2.4rem;font-weight:900;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero-sub{color:var(--muted);font-size:.95rem;margin-bottom:20px}
+.stats-row{display:flex;justify-content:center;gap:24px;margin-bottom:24px}
+.stat-box{text-align:center}
+.stat-val{font-size:1.8rem;font-weight:900;color:var(--blue3)}
+.stat-lbl{font-size:.7rem;color:var(--dim)}
+/* SUBJECT CARD */
+.subj-card{display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s}
+.subj-card:hover{border-color:var(--blue2);transform:translateY(-2px)}
+.subj-emoji{font-size:2rem;flex-shrink:0}
+.subj-info{flex:1}
+.subj-name{font-weight:700;font-size:1.05rem}
+.subj-meta{font-size:.8rem;color:var(--muted);margin-top:2px}
+.subj-arrow{color:var(--blue3);font-size:1.5rem;margin-left:auto}
+.subj-score{text-align:center;margin-left:8px}
+.subj-score-val{font-size:1.3rem;font-weight:900}
+.subj-score-lbl{font-size:.65rem;color:var(--dim)}
+.progress-bar{height:5px;background:#1e3a5f;border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:3px;transition:width .8s ease}
+/* QUIZ */
+.quiz-topbar{background:#0f172a;padding:8px 20px;border-bottom:1px solid rgba(30,64,175,.2)}
+.quiz-meta{max-width:700px;margin:0 auto;display:flex;gap:8px;align-items:center}
+.quiz-prog-outer{flex:1;height:4px;background:#1e3a5f;border-radius:2px;overflow:hidden}
+.quiz-prog-inner{height:100%;border-radius:2px;transition:width .3s}
+.quiz-answered{font-size:.72rem;color:var(--dim);white-space:nowrap}
+.timer{font-family:monospace;font-weight:700;font-size:1rem;padding:4px 10px;border-radius:6px;background:#1e3a5f}
+.timer.warn{color:var(--red);background:rgba(239,68,68,.15)}
+.timer.ok{color:var(--green)}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px}
+.q-number{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.q-text{font-size:1rem;line-height:1.7;color:#f1f5f9;margin-bottom:18px}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:8px;margin-bottom:8px;cursor:pointer;border:1px solid var(--border);background:rgba(30,41,59,.8);transition:all .15s;user-select:none}
+.opt:hover:not(.locked){border-color:var(--blue2);background:rgba(37,99,235,.15)}
+.opt.selected-wrong{border-color:var(--red)!important;background:rgba(239,68,68,.15)!important;color:var(--red)}
+.opt.selected-correct,.opt.correct-ans{border-color:var(--green)!important;background:rgba(34,197,94,.15)!important;color:var(--green)}
+.opt.locked{cursor:default}
+.opt-label{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:rgba(30,64,175,.5);font-weight:700;font-size:.8rem;flex-shrink:0}
+.opt-text{flex:1;font-size:.95rem}
+.opt-icon{margin-left:auto;font-size:.9rem}
+.feedback-box{padding:10px 14px;border-radius:8px;border-left:3px solid var(--blue3);background:rgba(30,64,175,.1);font-size:.85rem;color:#93c5fd;margin-top:4px}
+.quiz-nav{display:flex;gap:8px;justify-content:space-between;margin-top:4px}
+/* GRID NAV */
+.grid-nav{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.grid-cell{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;cursor:pointer;background:#1e3a5f;color:#94a3b8;border:1px solid transparent;transition:all .15s}
+.grid-cell.answered{background:#15803d;color:#fff}
+.grid-cell.current{background:var(--blue);color:#fff;border-color:#93c5fd}
+/* RESULT */
+.result-hero{text-align:center;padding:28px 0}
+.grade-letter{font-size:5rem;font-weight:900;line-height:1}
+.result-pct{font-size:2.5rem;font-weight:900;margin:4px 0}
+.result-label{color:var(--muted);margin-bottom:8px}
+.result-status{font-weight:700;font-size:1.1rem;margin-top:8px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px}
+.metric{text-align:center}
+.metric-val{font-size:1.5rem;font-weight:900}
+.metric-lbl{font-size:.7rem;color:var(--dim)}
+/* REVIEW */
+.review-item{background:var(--card);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px;margin-bottom:10px}
+.review-q{font-size:.9rem;color:#f1f5f9;margin-bottom:10px;line-height:1.5}
+.review-opt{padding:6px 10px;border-radius:6px;font-size:.83rem;margin-bottom:4px}
+.review-opt.correct{background:rgba(34,197,94,.1);color:var(--green)}
+.review-opt.wrong{background:rgba(239,68,68,.08);color:var(--red)}
+.review-opt.neutral{color:var(--muted)}
+/* HISTORY */
+.hist-item{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hist-subj{font-weight:700;font-size:.95rem}
+.hist-date{font-size:.75rem;color:var(--dim)}
+.hist-grade{font-size:1.3rem;font-weight:900;text-align:center;min-width:36px}
+.hist-pct{font-size:1.3rem;font-weight:900;text-align:right;min-width:56px}
+.hist-result{font-size:.72rem;font-weight:700}
+/* STATS */
+.stat-card-subj{font-weight:700;font-size:1.05rem;margin-bottom:10px}
+.stat-mini-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.stat-mini-lbl{font-size:.68rem;color:var(--dim)}
+.stat-mini-val{font-weight:700;color:#93c5fd;font-size:.95rem}
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tab-btn{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:.88rem;background:transparent;border:1.5px solid var(--border)!important;color:var(--muted)}
+.tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)!important}
+/* READ */
+.read-layout{display:flex;gap:18px;align-items:flex-start}
+.read-sidebar{width:180px;flex-shrink:0;position:sticky;top:80px}
+.read-topic-btn{width:100%;text-align:left;padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:.83rem;font-family:inherit;background:rgba(15,22,40,.5);border:1px solid rgba(30,64,175,.2)!important;color:var(--muted);cursor:pointer;transition:all .15s}
+.read-topic-btn:hover{background:rgba(37,99,235,.1);color:var(--blue3)}
+.read-topic-btn.active{background:rgba(37,99,235,.25);border-color:var(--blue2)!important;color:#93c5fd}
+.read-content{flex:1;min-width:0}
+.read-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+.read-title{font-size:1.3rem;font-weight:700;color:#93c5fd;margin-bottom:16px}
+.read-body{line-height:1.9;color:#cbd5e1;font-size:.92rem}
+.read-body p{margin-bottom:12px}
+.read-body strong{color:#93c5fd}
+.read-nav{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:14px;border-top:1px solid rgba(30,64,175,.2)}
+.read-page{font-size:.82rem;color:var(--dim)}
+/* SUBJECT SELECT for read */
+.read-subj-card{display:flex;align-items:center;gap:16px;cursor:pointer}
+.read-subj-card:hover{border-color:var(--blue2)}
+.read-topics-count{font-size:.75rem;color:var(--blue3);margin-top:4px}
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+/* SECTION HEADER */
+.section-hdr{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+/* RESPONSIVE */
+@media(max-width:600px){
+  .hero-title{font-size:1.8rem}
+  .metrics-grid{grid-template-columns:1fr 1fr 1fr}
+  .read-layout{flex-direction:column}
+  .read-sidebar{width:100%;position:static}
+  .read-sidebar .read-topic-list{display:flex;flex-wrap:wrap;gap:6px}
+  .read-topic-btn{width:auto;margin-bottom:0}
+  .container{padding:16px 12px}
+  .card{padding:16px}
+}
+/* SMOOTH TRANSITIONS */
+.screen{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--blue)}
+/* Floating submit */
+.floating-submit{position:fixed;bottom:20px;right:20px;z-index:200;padding:12px 22px;border-radius:50px;background:var(--purple);color:#fff;font-weight:700;font-size:.9rem;box-shadow:0 4px 20px rgba(124,58,237,.4)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HOME ===================== -->
+<div id="screen-home" class="screen active">
+  <div class="nav">
+    <div class="nav-left">
+      <span class="nav-logo">📚 JAMB CBT Pro</span>
+    </div>
+    <div class="nav-right">
+      <button class="btn-outline btn-sm" onclick="showRead()">📖 Read</button>
+      <button class="btn btn-primary btn-sm" onclick="showHistory()">📊 History</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="home-hero">
+      <div class="hero-title">JAMB CBT Pro</div>
+      <div class="hero-sub">1000+ questions per subject · 50 per session · Full analytics</div>
+      <div id="home-stats" class="stats-row" style="display:none"></div>
+    </div>
+    <div class="section-hdr">Choose a Subject to Practice</div>
+    <div id="subject-list"></div>
+    <div class="card" style="background:linear-gradient(135deg,rgba(30,64,175,.25),rgba(109,40,217,.2));cursor:pointer;text-align:center" onclick="showRead()">
+      <div style="font-size:1.6rem;margin-bottom:4px">📖 Read Mode</div>
+      <div style="color:var(--muted);font-size:.9rem">Study theory, concepts & exam tips across all subjects</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SUBJECT ===================== -->
+<div id="screen-subject" class="screen">
+  <div class="nav">
+    <div class="nav-left">
+      <button class="back-btn" onclick="showHome()">←</button>
+      <span class="nav-logo">📚 JAMB CBT Pro</span>
+      <span class="nav-title" id="subj-nav-title"></span>
+    </div>
+  </div>
+  <div class="container-sm">
+    <div style="text-align:center;margin-bottom:28px">
+      <div id="subj-emoji" style="font-size:4rem;margin-bottom:10px"></div>
+      <h1 id="subj-title" style="font-size:2rem;font-weight:900;margin-bottom:4px"></h1>
+      <div id="subj-bank-info" style="color:var(--muted);font-size:.9rem"></div>
+    </div>
+    <div id="subj-stats-cards" class="metrics-grid" style="margin-bottom:20px"></div>
+    <div class="card">
+      <div style="font-weight:700;color:#93c5fd;margin-bottom:12px">Session Info</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><div style="font-size:.72rem;color:var(--dim)">Questions</div><div style="font-weight:700">50 (random)</div></div>
+        <div><div style="font-size:.72rem;color:var(--dim)">Duration</div><div style="font-weight:700">30 minutes</div></div>
+        <div><div style="font-size:.72rem;color:var(--dim)">Marking</div><div style="font-weight:700">+1 per correct</div></div>
+        <div><div style="font-size:.72rem;color:var(--dim)">Passing</div><div style="font-weight:700">50% (25/50)</div></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="startQuiz()">🚀 Start Practice Session</button>
+  </div>
+</div>
+
+<!-- ===================== QUIZ ===================== -->
+<div id="screen-quiz" class="screen">
+  <div class="nav">
+    <div class="nav-left">
+      <span class="nav-logo" id="quiz-subj-label">📚 Physics</span>
+      <span class="nav-title" id="quiz-qnum">Q1/50</span>
+    </div>
+    <div class="nav-right">
+      <span class="timer ok" id="quiz-timer">30:00</span>
+      <button class="btn btn-purple btn-sm" onclick="confirmFinish()">Submit</button>
+    </div>
+  </div>
+  <div class="quiz-topbar">
+    <div class="quiz-meta">
+      <div class="quiz-prog-outer"><div id="qprog-q" class="quiz-prog-inner" style="background:linear-gradient(90deg,#1e40af,#3b82f6);width:2%"></div></div>
+      <div class="quiz-prog-outer"><div id="qprog-t" class="quiz-prog-inner" style="background:var(--green);width:100%"></div></div>
+      <span class="quiz-answered" id="quiz-answered">0 answered</span>
+    </div>
+  </div>
+  <div class="container" style="padding-top:18px">
+    <div class="q-card">
+      <div class="q-number" id="q-number-label">QUESTION 1 OF 50</div>
+      <div class="q-text" id="q-text">Loading...</div>
+      <div id="q-options"></div>
+      <div id="q-feedback" style="display:none" class="feedback-box"></div>
+    </div>
+    <div class="quiz-nav">
+      <button class="btn-outline btn-sm" onclick="prevQ()" id="btn-prev">← Prev</button>
+      <button class="btn btn-primary btn-sm" onclick="nextQ()" id="btn-next">Next →</button>
+    </div>
+    <div class="card" style="margin-top:14px;padding:14px">
+      <div style="font-size:.72rem;color:var(--dim);margin-bottom:8px">QUESTION NAVIGATOR</div>
+      <div class="grid-nav" id="grid-nav"></div>
+    </div>
+  </div>
+  <button class="floating-submit" onclick="confirmFinish()">✓ Submit All</button>
+</div>
+
+<!-- ===================== RESULT ===================== -->
+<div id="screen-result" class="screen">
+  <div class="nav">
+    <div class="nav-left">
+      <span class="nav-logo">📊 Result</span>
+    </div>
+    <div class="nav-right">
+      <button class="btn-outline btn-sm" onclick="showHome()">🏠 Home</button>
+    </div>
+  </div>
+  <div class="container-sm">
+    <div class="result-hero">
+      <div id="result-emoji" style="font-size:3.5rem;margin-bottom:8px">🎉</div>
+      <div class="grade-letter" id="result-grade">A</div>
+      <div class="result-pct" id="result-pct">90%</div>
+      <div class="result-label" id="result-label">45 / 50 correct · English</div>
+      <div class="result-status" id="result-status">✅ PASSED</div>
+    </div>
+    <div class="metrics-grid">
+      <div class="card metric"><div class="metric-val" id="r-correct" style="color:var(--green)">45</div><div class="metric-lbl">Correct</div></div>
+      <div class="card metric"><div class="metric-val" id="r-wrong" style="color:var(--red)">5</div><div class="metric-lbl">Wrong</div></div>
+      <div class="card metric"><div class="metric-val" id="r-skip" style="color:var(--muted)">0</div><div class="metric-lbl">Skipped</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-primary btn-block" onclick="retryQuiz()">🔄 Try Again</button>
+      <button class="btn btn-purple btn-block" onclick="showHistory()">📊 History</button>
+    </div>
+    <button class="btn-outline btn-block" onclick="toggleReview()" id="review-toggle-btn">▼ Review Wrong Answers</button>
+    <div id="review-section" style="display:none;margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- ===================== HISTORY ===================== -->
+<div id="screen-history" class="screen">
+  <div class="nav">
+    <div class="nav-left">
+      <button class="back-btn" onclick="showHome()">←</button>
+      <span class="nav-logo">📊 History & Stats</span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-hist" onclick="switchTab('hist')">📋 History</button>
+      <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">📈 Statistics</button>
+    </div>
+    <div id="hist-panel"></div>
+    <div id="stats-panel" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===================== READ (subject select) ===================== -->
+<div id="screen-read" class="screen">
+  <div class="nav">
+    <div class="nav-left">
+      <button class="back-btn" onclick="showHome()">←</button>
+      <span class="nav-logo">📖 Read Mode</span>
+    </div>
+  </div>
+  <div class="container">
+    <div style="margin-bottom:20px">
+      <div style="font-size:1.3rem;font-weight:700;color:#93c5fd;margin-bottom:6px">Study Materials</div>
+      <div style="color:var(--muted);font-size:.9rem">Deep-dive into theory, concepts and exam strategies for JAMB.</div>
+    </div>
+    <div id="read-subject-list"></div>
+  </div>
+</div>
+
+<!-- ===================== READ TOPIC ===================== -->
+<div id="screen-readtopic" class="screen">
+  <div class="nav">
+    <div class="nav-left">
+      <button class="back-btn" onclick="showRead()">←</button>
+      <span class="nav-logo">📖 <span id="read-nav-subj"></span></span>
+    </div>
+    <div class="nav-right">
+      <button class="btn-outline btn-sm" onclick="showHome()">🏠</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="read-layout">
+      <div class="read-sidebar">
+        <div style="font-size:.72rem;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Topics</div>
+        <div class="read-topic-list" id="read-topic-list"></div>
+      </div>
+      <div class="read-content">
+        <div id="read-placeholder" class="empty">
+          <div class="empty-icon">👈</div>
+          <div>Select a topic from the list to start reading</div>
+        </div>
+        <div id="read-card" class="read-card" style="display:none">
+          <div class="read-title" id="read-card-title"></div>
+          <div class="read-body" id="read-card-body"></div>
+          <div class="read-nav">
+            <button class="btn-outline btn-sm" onclick="prevTopic()" id="btn-read-prev">← Prev</button>
+            <span class="read-page" id="read-page-info">1 / 6</span>
+            <button class="btn btn-primary btn-sm" onclick="nextTopic()" id="btn-read-next">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// DATA: QUESTION BANK
+// ================================================================
+const SUBJECTS = ['English','Mathematics','Physics','Chemistry','Biology'];
+const EMOJIS = {English:'📖',Mathematics:'📐',Physics:'⚛️',Chemistry:'🧪',Biology:'🔬'};
+
+// ---- ENGLISH ----
+const englishBase = [
+  {q:"Choose the word nearest in meaning to 'BENEVOLENT'",opts:["Kind","Wicked","Greedy","Lazy"],ans:0},
+  {q:"Which sentence is grammatically correct?",opts:["She don't like him","She doesn't likes him","She doesn't like him","She not like him"],ans:2},
+  {q:"The word 'UBIQUITOUS' means",opts:["Rare","Present everywhere","Dangerous","Unusual"],ans:1},
+  {q:"Choose the antonym of 'VERBOSE'",opts:["Talkative","Concise","Wordy","Lengthy"],ans:1},
+  {q:"'The book was written by him' — identify the voice",opts:["Active","Passive","Neither","Both"],ans:1},
+  {q:"Choose the correct spelling",opts:["Accomodate","Accommodate","Acommodate","Accommoddate"],ans:1},
+  {q:"What figure of speech is 'The sun smiled on us'?",opts:["Simile","Metaphor","Personification","Hyperbole"],ans:2},
+  {q:"The plural of 'criterion' is",opts:["Criterions","Criteria","Criterias","Criterias"],ans:1},
+  {q:"Which is correctly punctuated?",opts:["Its a dog","It's a dog","Its' a dog","It'sa dog"],ans:1},
+  {q:"Which word is a homophone of 'right'?",opts:["Write","Rite","Both A and B","Neither"],ans:2},
+  {q:"The word 'EPHEMERAL' means",opts:["Long-lasting","Short-lived","Ancient","Powerful"],ans:1},
+  {q:"Which sentence uses the subjunctive mood?",opts:["If I was rich","If I were rich","If I am rich","If I be rich"],ans:1},
+  {q:"'To kick the bucket' means",opts:["To start working","To die","To play football","To be angry"],ans:1},
+  {q:"The word 'AMELIORATE' means",opts:["Worsen","Improve","Destroy","Create"],ans:1},
+  {q:"What is the gerund in: 'Swimming is my hobby'?",opts:["is","my","Swimming","hobby"],ans:2},
+  {q:"The synonym of 'LOQUACIOUS' is",opts:["Silent","Talkative","Shy","Rude"],ans:1},
+  {q:"Which of these is a conjunction?",opts:["Run","Beautiful","Although","Quickly"],ans:2},
+  {q:"The word 'PANACEA' means",opts:["A disease","A cure for all ills","A type of food","A pain reliever"],ans:1},
+  {q:"Identify the clause: 'When the rain stopped, we went out'",opts:["Noun clause","Adverbial clause","Relative clause","Main clause"],ans:1},
+  {q:"Antonym of 'FRUGAL'",opts:["Thrifty","Wasteful","Careful","Miserly"],ans:1},
+  {q:"Which is correct?",opts:["Between you and I","Between you and me","Between I and you","Between me and I"],ans:1},
+  {q:"A 'BIBLIOGRAPHY' is a list of",opts:["Books referenced","Authors","Characters","Chapters"],ans:0},
+  {q:"'The pen is mightier than the sword' is an example of",opts:["Metaphor","Simile","Paradox","Irony"],ans:0},
+  {q:"The word 'LACONIC' means",opts:["Using few words","Very emotional","Extremely loud","Highly intelligent"],ans:0},
+  {q:"Future perfect tense?",opts:["I will go","I will have gone","I am going","I went"],ans:1},
+  {q:"'As brave as a lion' — figure of speech?",opts:["Metaphor","Personification","Simile","Hyperbole"],ans:2},
+  {q:"Collective noun for 'lions'",opts:["Pack","Pride","Flock","Herd"],ans:1},
+  {q:"DILATORY means",opts:["Urgent","Slow to act","Energetic","Precise"],ans:1},
+  {q:"GARRULOUS means",opts:["Quiet","Excessively talkative","Wise","Foolish"],ans:1},
+  {q:"Passive voice: 'Mary ate the cake'",opts:["The cake was eaten by Mary","Mary had eaten the cake","The cake Mary ate","Mary is eating the cake"],ans:0},
+  {q:"MAGNANIMOUS means",opts:["Petty","Generous in spirit","Angry","Cowardly"],ans:1},
+  {q:"An oxymoron is",opts:["Two contradictory words together","A very loud sound","A type of poem","Exaggerated statement"],ans:0},
+  {q:"'I wish I ___ there'",opts:["was","were","am","is"],ans:1},
+  {q:"SURREPTITIOUS means",opts:["Open","Secretive","Aggressive","Generous"],ans:1},
+  {q:"An ELEGY is a poem that",opts:["Celebrates life","Mourns the dead","Tells a story","Praises nature"],ans:1},
+  {q:"Root word of 'INCREDIBLE' means",opts:["To believe","To see","To hear","To touch"],ans:0},
+  {q:"Which is an abstract noun?",opts:["Table","Tree","Freedom","River"],ans:2},
+  {q:"OBSEQUIOUS means",opts:["Defiant","Excessively compliant","Independent","Rude"],ans:1},
+  {q:"ONOMATOPOEIA refers to words that",opts:["Rhyme","Imitate sounds","Are long","Are foreign"],ans:1},
+  {q:"A SOLILOQUY is speech delivered",opts:["To an audience","To oneself","To God","To an enemy"],ans:1},
+  {q:"Which word has a silent letter?",opts:["Cat","Knife","Dog","Run"],ans:1},
+  {q:"Which is an interjection?",opts:["Run","Oh!","The","Slowly"],ans:1},
+  {q:"PEDAGOGY is the study of",opts:["Teaching","Animals","Rocks","Stars"],ans:0},
+  {q:"A CACOPHONY is",opts:["Sweet sound","Harsh sound","No sound","Loud music"],ans:1},
+  {q:"ANTITHESIS means",opts:["Agreement","Direct opposite","Similarity","Parallel"],ans:1},
+  {q:"Choose the adverb: 'She runs quickly'",opts:["She","runs","quickly","—"],ans:2},
+  {q:"'Its' vs 'It's' — 'It's' is short for",opts:["Its is","It is / It has","It was","It will"],ans:1},
+  {q:"A PARADOX is",opts:["A statement that is obviously false","A statement that seems contradictory but may be true","A type of rhyme scheme","A figure of repetition"],ans:1},
+  {q:"LOQUACIOUS is to TALKATIVE as TACITURN is to",opts:["Loud","Reserved","Angry","Happy"],ans:1},
+  {q:"HYPERBOLE is",opts:["Understatement","Deliberate exaggeration","A comparison using like","Direct comparison"],ans:1},
+];
+
+const vocabPairs=[
+  ["AUDACIOUS","Bold"],["BELLICOSE","Warlike"],["CAPRICIOUS","Unpredictable"],["DOGMATIC","Opinionated"],
+  ["EGREGIOUS","Outstandingly bad"],["FASTIDIOUS","Very careful"],["GAUNT","Very thin"],["HAPLESS","Unlucky"],
+  ["IMPECCABLE","Flawless"],["JOCULAR","Humorous"],["KNAVE","Dishonest person"],["LUCID","Clear"],
+  ["MALLEABLE","Flexible"],["NEFARIOUS","Wicked"],["OBSTINATE","Stubborn"],["PENSIVE","Thoughtful"],
+  ["QUERULOUS","Complaining"],["RECALCITRANT","Defiant"],["SAGACIOUS","Wise"],["TACITURN","Reserved"],
+  ["UNCTUOUS","Excessively flattering"],["VACUOUS","Empty-minded"],["WANTON","Deliberate cruelty"],["XENIAL","Hospitable"],
+  ["ZEALOUS","Enthusiastic"],["ABSTRUSE","Hard to understand"],["BUCOLIC","Pastoral/Rural"],["CACOPHONOUS","Harsh sounding"],
+  ["DEARTH","Scarcity"],["FATUOUS","Silly and pointless"],["GRANDILOQUENT","Pompous speech"],["HARBINGER","Forerunner"],
+  ["IDIOSYNCRATIC","Peculiar habit"],["JETTISON","To abandon"],["KINETIC","Relating to motion"],["LAMBASTE","To criticize harshly"],
+  ["MENDACIOUS","Lying"],["NUANCE","Subtle difference"],["OSTENTATIOUS","Showy"],["PARSIMONIOUS","Miserly"],
+  ["QUIXOTIC","Idealistic and impractical"],["RANCOROUS","Bitter resentment"],["TENACIOUS","Persistent"],["UMBRAGE","Offense taken"],
+  ["PERSPICACIOUS","Having keen insight"],["VIVACIOUS","Lively and animated"],["FALLACIOUS","Based on false reasoning"],["VERACIOUS","Truthful"],
+  ["CAPACIOUS","Spacious"],["RAPACIOUS","Excessively greedy"],["PUGNACIOUS","Aggressive, combative"],["PERTINACIOUS","Stubbornly persistent"],
+  ["EQUIVOCAL","Ambiguous"],["INIMICAL","Hostile"],["PERFIDIOUS","Treacherous"],["SYCOPHANTIC","Flattering to gain favor"],
+  ["MERETRICIOUS","Apparently attractive but false"],["TRUCULENT","Aggressive, defiant"],["VOLUBLE","Speaking fluently"],["LIMPID","Clear, transparent"],
+  ["INSIPID","Lacking flavor or interest"],["PROLIX","Using too many words"],["TERSE","Sparing with words"],["PITHY","Concise and meaningful"],
+  ["BYZANTINE","Complicated, devious"],["MAUDLIN","Tearfully sentimental"],["PHLEGMATIC","Having calm temperament"],["SANGUINE","Optimistic"],
+  ["CHOLERIC","Easily angered"],["MELANCHOLIC","Sad and thoughtful"],["LACHRYMOSE","Tearful"],["LUGUBRIOUS","Mournful"],
+  ["EBULLIENT","Enthusiastically cheerful"],["EFFUSIVE","Expressing freely"],["RETICENT","Reserved"],["VERBOSE","Using too many words"],
+];
+
+const wrongMeanings=["The opposite meaning","An unrelated concept","A false alternative","Something completely different","A common misconception"];
+const engVocab=vocabPairs.map(([w,m],i)=>{
+  const opts=[m,...wrongMeanings.slice(0,3).map((x,j)=>wrongMeanings[(i+j+1)%wrongMeanings.length])];
+  return {q:`What does '${w}' mean?`,opts:[m,wrongMeanings[i%5],wrongMeanings[(i+1)%5],wrongMeanings[(i+2)%5]],ans:0};
+});
+
+const grammarBank=[
+  {q:"She __ arrived when we left",opts:["had","have","has","having"],ans:0},
+  {q:"They __ playing since morning",opts:["is","has been","have been","was"],ans:2},
+  {q:"Neither John nor his friends __ coming",opts:["is","are","were","was"],ans:1},
+  {q:"Which is a preposition?",opts:["Run","Under","Blue","Quickly"],ans:1},
+  {q:"Correct: 'Everyone should bring __ own book'",opts:["their","there","his or her","all of these"],ans:2},
+  {q:"The conditional type: 'If it rains, we will stay'",opts:["Zero","First","Second","Third"],ans:1},
+  {q:"Choose the determiner",opts:["The","Run","Quick","Softly"],ans:0},
+  {q:"'He is older than ___'",opts:["me","I","my","mine"],ans:0},
+  {q:"'The news ___ bad today'",opts:["are","is","were","have been"],ans:1},
+  {q:"Identify the indirect object: 'She gave John a book'",opts:["She","gave","John","book"],ans:2},
+  {q:"A RHETORICAL question expects",opts:["A detailed answer","No answer","A yes/no answer","A written answer"],ans:1},
+  {q:"ALLITERATION is the repetition of",opts:["Vowel sounds","Initial consonant sounds","End sounds","Middle sounds"],ans:1},
+  {q:"ASSONANCE is the repetition of",opts:["Consonant sounds","Vowel sounds in words","End rhymes","Stress patterns"],ans:1},
+  {q:"What is a STANZA?",opts:["A type of poem","A group of lines in poetry","A rhyme scheme","A figure of speech"],ans:1},
+  {q:"An ODE is a poem that",opts:["Mourns the dead","Praises or glorifies a subject","Tells a narrative","Uses no rhyme"],ans:1},
+  {q:"Which tense: 'By next year I ___ graduated'",opts:["will have","will","shall","would"],ans:0},
+  {q:"A MALAPROPISM is",opts:["Correct word usage","Using a wrong word that sounds similar","A type of metaphor","Repetition of a word"],ans:1},
+  {q:"ELLIPSIS in writing refers to",opts:["Exaggeration","Omission of words understood in context","A question mark","Bold text"],ans:1},
+  {q:"TAUTOLOGY means",opts:["Saying the same thing twice","A contradiction","A figure of sound","A short story"],ans:0},
+  {q:"Which word means 'following in time'?",opts:["Antecedent","Subsequent","Precedent","Concurrent"],ans:1},
+];
+
+// Pad English to 1000+
+function makeEngExtra(n){
+  const patterns=[
+    (i)=>({q:`JAMB Vocabulary ${i+1}: 'PERSPICUOUS' means`,opts:["Obscure","Clearly expressed","Very old","Very new"],ans:1}),
+    (i)=>({q:`Grammar ${i+1}: Choose the correct: 'It was __ who came'`,opts:["him","he","his","himself"],ans:1}),
+    (i)=>({q:`Word class ${i+1}: 'Quickly' is a(n)`,opts:["Adjective","Noun","Adverb","Conjunction"],ans:2}),
+    (i)=>({q:`Spelling ${i+1}: Which is correctly spelled?`,opts:["Neccesary","Necessary","Necesary","Neccesery"],ans:1}),
+    (i)=>({q:`Figure of speech ${i+1}: 'He ran like the wind' is a`,opts:["Metaphor","Simile","Hyperbole","Irony"],ans:1}),
+    (i)=>({q:`Tense ${i+1}: 'She had finished before he arrived' is`,opts:["Simple past","Past perfect","Present perfect","Future perfect"],ans:1}),
+    (i)=>({q:`Vocabulary ${i+1}: AMELIORATE means to`,opts:["Worsen","Improve","Ignore","Destroy"],ans:1}),
+    (i)=>({q:`Literature ${i+1}: A PROTAGONIST is the`,opts:["Villain","Main character","Author","Narrator"],ans:1}),
+  ];
+  const arr=[];
+  for(let i=0;i<n;i++) arr.push(patterns[i%patterns.length](i));
+  return arr;
+}
+
+const englishQuestions=[...englishBase,...engVocab,...grammarBank,...makeEngExtra(900)];
+
+// ---- MATHEMATICS ----
+const mathBase=[
+  {q:"Evaluate: 2³ × 4²",opts:["128","64","96","32"],ans:0},
+  {q:"Find x if 3x − 7 = 14",opts:["5","7","3","9"],ans:1},
+  {q:"Sum of angles in a triangle",opts:["180°","360°","90°","270°"],ans:0},
+  {q:"Simplify: (x² − 9)/(x − 3)",opts:["x + 3","x − 3","x² + 3","x + 9"],ans:0},
+  {q:"log₁₀(1000) = ?",opts:["2","3","4","10"],ans:1},
+  {q:"P={1,2,3}, Q={2,3,4}, find P∩Q",opts:["{1,2,3,4}","{2,3}","{1,4}","{3}"],ans:1},
+  {q:"Gradient of y = 3x² − 2x + 1 at x = 2",opts:["10","12","8","14"],ans:0},
+  {q:"HCF of 24 and 36",opts:["6","12","4","8"],ans:1},
+  {q:"Solve: x² − 5x + 6 = 0",opts:["x=2,3","x=1,6","x=−2,−3","x=1,5"],ans:0},
+  {q:"15% of 200",opts:["25","30","35","40"],ans:1},
+  {q:"Area of circle r=7cm (π≈22/7)",opts:["44cm²","154cm²","22cm²","77cm²"],ans:1},
+  {q:"LCM of 12 and 18",opts:["6","36","24","72"],ans:1},
+  {q:"If tanθ = 3/4, find sinθ",opts:["3/5","4/5","3/4","4/3"],ans:0},
+  {q:"Expand (2x + 3)²",opts:["4x²+9","4x²+12x+9","4x²+6x+9","2x²+12x+9"],ans:1},
+  {q:"Mean of 4,7,3,9,2",opts:["4","5","6","7"],ans:1},
+  {q:"Convert 0.375 to fraction",opts:["3/8","3/7","3/4","5/8"],ans:0},
+  {q:"Differentiate y = 5x³",opts:["15x","15x²","5x²","10x³"],ans:1},
+  {q:"Perimeter: L=8cm, W=5cm",opts:["26cm","40cm","13cm","80cm"],ans:0},
+  {q:"Simplify: √(49/16)",opts:["7/4","4/7","49/4","7/2"],ans:0},
+  {q:"If 2^x = 32, find x",opts:["3","4","5","6"],ans:2},
+  {q:"Mode of 2,3,3,4,4,4,5",opts:["2","3","4","5"],ans:2},
+  {q:"Evaluate: ∫6x dx",opts:["3x² + C","6x² + C","x² + C","6 + C"],ans:0},
+  {q:"Hypotenuse of right triangle with legs 3 and 4",opts:["5","6","7","8"],ans:0},
+  {q:"Simplify: 3/4 + 1/6",opts:["4/10","11/12","5/12","7/12"],ans:1},
+  {q:"Range of 5,9,2,15,7",opts:["10","13","5","15"],ans:1},
+  {q:"Value of π (approximately)",opts:["3.14","3.41","3.12","3.21"],ans:0},
+  {q:"f(x) = 2x + 3, find f(4)",opts:["10","11","12","9"],ans:1},
+  {q:"Sides of a hexagon",opts:["5","6","7","8"],ans:1},
+  {q:"Solve: |x − 3| = 5",opts:["x=8 or x=−2","x=8 only","x=−2 only","x=2 or x=−8"],ans:0},
+  {q:"Sum of AP: first=3, d=2, n=5",opts:["25","23","21","27"],ans:0},
+  {q:"5! (5 factorial)",opts:["20","60","120","100"],ans:2},
+  {q:"Equation: slope 2 through (0,3)",opts:["y=2x+3","y=3x+2","y=2x−3","y=−2x+3"],ans:0},
+  {q:"20 in binary",opts:["10100","10010","10000","10110"],ans:0},
+  {q:"Simplify: (3x²y)(2xy³)",opts:["6x³y⁴","5x³y⁴","6x²y³","5x²y⁴"],ans:0},
+  {q:"Volume of cube with side 3cm",opts:["9cm³","18cm³","27cm³","36cm³"],ans:2},
+  {q:"log₂(x) = 4, find x",opts:["6","8","16","12"],ans:2},
+  {q:"Median of 1,2,3,4,5,6,7",opts:["3","4","3.5","5"],ans:1},
+  {q:"Evaluate: (1/2)⁻³",opts:["8","1/8","4","1/4"],ans:0},
+  {q:"Speed: 120km in 2hrs",opts:["50km/h","60km/h","70km/h","80km/h"],ans:1},
+  {q:"Evaluate: 3² + 4²",opts:["25","49","7","12"],ans:0},
+  {q:"Solve: 2(x − 3) = 10",opts:["x=5","x=7","x=8","x=4"],ans:2},
+  {q:"Surface area of a sphere r=3cm (π≈22/7)",opts:["28.3cm²","113.1cm²","37.7cm²","254.4cm²"],ans:1},
+  {q:"Index form of 64",opts:["2⁵","2⁶","4³","Both B and C"],ans:3},
+  {q:"Evaluate: ⁷C₃",opts:["21","35","42","70"],ans:1},
+  {q:"Arithmetic mean of 10,20,30,40,50",opts:["25","30","35","40"],ans:1},
+  {q:"Solve: 4x + 3 = 2x + 11",opts:["x=2","x=4","x=3","x=5"],ans:1},
+  {q:"The gradient of y = 5 is",opts:["5","1","0","Undefined"],ans:2},
+  {q:"Simplify: 2⁴ / 2²",opts:["4","2","8","1"],ans:0},
+  {q:"Convert 5/8 to decimal",opts:["0.5","0.625","0.6","0.525"],ans:1},
+  {q:"P(A)=0.4, P(B)=0.3 independent. P(A and B)=?",opts:["0.7","0.12","0.28","0.1"],ans:1},
+];
+
+function mathGen(count){
+  const qs=[];
+  for(let i=0;i<count;i++){
+    const t=i%10;
+    let q,opts,ans;
+    if(t===0){const a=(i%11)+3,b=(i%13)+2,c=a*b;q=`${a} × ${b} = ?`;opts=[c,c+2,c-3,c+5].map(String);ans=0;}
+    else if(t===1){const a=(i%15)+5,b=(i%12)+3,c=a+b;q=`Sum of ${a} and ${b}`;opts=[c+1,c,c-2,c+3].map(String);ans=1;}
+    else if(t===2){const n=(i%9)+2,c=n*n;q=`${n}² = ?`;opts=[c-1,c+1,c,c+4].map(String);ans=2;}
+    else if(t===3){const ns=[4,9,16,25,36,49,64,81,100,121],n=ns[i%10],c=Math.sqrt(n);q=`√${n} = ?`;opts=[c-1,c+1,c+2,c].map(String);ans=3;}
+    else if(t===4){const a=(i%8)+2,b=(i%6)+1,c=a+b;q=`${a}x + ${b}x = ?`;opts=[`${c}x`,`${a*b}x`,`${c-1}x`,`${a}x²`];ans=0;}
+    else if(t===5){const p=(i%9+1)*10,base=(i%8+2)*25,c=p*base/100;q=`${p}% of ${base}`;opts=[c+5,c-5,c,c*2].map(String);ans=2;}
+    else if(t===6){const a=(i%10)+3,b=(i%7)+2;q=`Solve: ${a}x = ${a*b}`;const c=b;opts=[c+1,c-1,c+2,c].map(String);ans=3;}
+    else if(t===7){const r=(i%7)+2,c=r*r;q=`Area of square, side=${r}cm`;opts=[`${c}cm²`,`${c*2}cm²`,`${c-1}cm²`,`${4*r}cm²`];ans=0;}
+    else if(t===8){const a=(i%6)+1,b=(i%5)+1,c=a*b;q=`Product of ${a} and ${b}`;opts=[c,c+1,c-1,c+2].map(String);ans=0;}
+    else{const n=(i%6)+2,c=n*n*n;q=`${n}³ = ?`;opts=[c,c+2,c-4,c+8].map(String);ans=0;}
+    qs.push({q,opts,ans});
+  }
+  return qs;
+}
+const mathQuestions=[...mathBase,...mathGen(951)];
+
+// ---- PHYSICS ----
+const physicsBase=[
+  {q:"SI unit of force",opts:["Joule","Newton","Pascal","Watt"],ans:1},
+  {q:"Speed of light in vacuum",opts:["3×10⁸ m/s","3×10⁶ m/s","3×10¹⁰ m/s","3×10⁴ m/s"],ans:0},
+  {q:"Newton's second law of motion",opts:["F = ma","v = u + at","P = mv","W = Fd"],ans:0},
+  {q:"Which is a vector quantity?",opts:["Temperature","Mass","Velocity","Speed"],ans:2},
+  {q:"Unit of electric resistance",opts:["Volt","Ampere","Ohm","Watt"],ans:2},
+  {q:"Formula for kinetic energy",opts:["KE = mgh","KE = ½mv²","KE = mv","KE = Fd"],ans:1},
+  {q:"Conservation of energy states",opts:["Energy can be created","Energy can be destroyed","Energy cannot be created or destroyed","Energy is always zero"],ans:2},
+  {q:"Ohm's law: V = ?",opts:["V = IR","V = I/R","V = I+R","V = I−R"],ans:0},
+  {q:"Acceleration due to gravity (g)",opts:["8.9 m/s²","9.8 m/s²","10.8 m/s²","9.0 m/s²"],ans:1},
+  {q:"Lens used to correct myopia",opts:["Convex","Concave","Bifocal","Cylindrical"],ans:1},
+  {q:"SI unit of electric current",opts:["Volt","Ohm","Ampere","Watt"],ans:2},
+  {q:"Frequency if period = 0.02s",opts:["20Hz","50Hz","100Hz","200Hz"],ans:1},
+  {q:"Archimedes' principle relates to",opts:["Upthrust in fluids","Heat transfer","Magnetic force","Electric current"],ans:0},
+  {q:"Wave requiring a medium to travel",opts:["Electromagnetic","Mechanical","Light","X-rays"],ans:1},
+  {q:"Unit of power",opts:["Joule","Newton","Watt","Pascal"],ans:2},
+  {q:"Momentum = ?",opts:["Mass × velocity","Mass × acceleration","Force × time","Mass × distance"],ans:0},
+  {q:"Shortest wavelength among these",opts:["Radio waves","Microwaves","X-rays","Gamma rays"],ans:3},
+  {q:"Internal resistance of ideal voltmeter",opts:["Zero","Infinite","Very low","50Ω"],ans:1},
+  {q:"Refractive index = ?",opts:["Speed in vacuum / speed in medium","Speed in medium / speed in vacuum","Frequency × wavelength","None"],ans:0},
+  {q:"At max displacement in SHM, velocity is",opts:["Maximum","Minimum","Zero","Constant"],ans:2},
+  {q:"Photoelectric effect explained by",opts:["Newton","Einstein","Bohr","Maxwell"],ans:1},
+  {q:"Work done when force ⊥ displacement",opts:["Maximum","Zero","Minimum","Constant"],ans:1},
+  {q:"Wave equation",opts:["f = vλ","λ = v/f","f = λ/v","v = f+λ"],ans:1},
+  {q:"Mirror used as rear-view mirror",opts:["Concave","Plane","Convex","Parabolic"],ans:2},
+  {q:"Unit of capacitance",opts:["Henry","Farad","Ohm","Weber"],ans:1},
+  {q:"Boyle's law: constant temperature",opts:["PV = constant","P/V = constant","PT = constant","P+V = constant"],ans:0},
+  {q:"Efficiency of a machine",opts:["Output/Input × 100","Input/Output × 100","Force/Distance","Work/Time"],ans:0},
+  {q:"Stick appears bent in water — phenomenon",opts:["Reflection","Diffraction","Refraction","Polarization"],ans:2},
+  {q:"Nuclear fission is the splitting of",opts:["Electrons","Neutrons","Heavy nuclei","Light nuclei"],ans:2},
+  {q:"Turning effect of a force",opts:["Pressure","Torque/Moment","Impulse","Energy"],ans:1},
+  {q:"Which is NOT renewable energy?",opts:["Solar","Wind","Nuclear","Hydro"],ans:2},
+  {q:"Charles' law: at constant pressure, V ∝",opts:["P","1/T","T","1/P"],ans:2},
+  {q:"SI unit of pressure",opts:["Newton","Joule","Pascal","Bar"],ans:2},
+  {q:"Charge on an electron",opts:["−1.6×10⁻¹⁹C","+1.6×10⁻¹⁹C","−1.6×10⁻¹² C","Zero"],ans:0},
+  {q:"Transformer works on principle of",opts:["Motor effect","Electromagnetic induction","Electrostatics","Nuclear fusion"],ans:1},
+  {q:"Concave mirror f=10cm, radius of curvature=?",opts:["5cm","10cm","20cm","15cm"],ans:2},
+  {q:"Sound travels fastest in",opts:["Air","Water","Vacuum","Steel"],ans:3},
+  {q:"Type of motion a pendulum exhibits",opts:["Circular","SHM","Random","Translational"],ans:1},
+  {q:"Isotopes have the same",opts:["Mass number","Neutron number","Proton number","All"],ans:2},
+  {q:"Ohm's law is valid for",opts:["Diodes","Ohmic conductors","All conductors","Capacitors"],ans:1},
+  {q:"Formula for pressure",opts:["P=F/A","P=mv","P=Fd","P=mgh"],ans:0},
+  {q:"Work done formula",opts:["W=Fd cosθ","W=mv²","W=Pt","W=mgh only"],ans:0},
+  {q:"Unit of frequency",opts:["Metre","Hertz","Newton","Second"],ans:1},
+  {q:"Which is a scalar?",opts:["Force","Velocity","Displacement","Speed"],ans:3},
+  {q:"Latent heat is absorbed/released during",opts:["Temperature change","Phase change","Pressure change","Volume change"],ans:1},
+  {q:"Nuclear fusion combines",opts:["Heavy nuclei","Light nuclei","Protons only","Electrons"],ans:1},
+  {q:"Doppler effect involves changes in",opts:["Speed","Amplitude","Frequency","Wavelength only"],ans:2},
+  {q:"Total internal reflection requires angle",opts:["Less than critical","Equal to critical","Greater than critical","Zero"],ans:2},
+  {q:"Formula for gravitational PE",opts:["PE=½mv²","PE=mgh","PE=Fd","PE=P/V"],ans:1},
+  {q:"Resistance of wires in series",opts:["R_T = R₁ × R₂","R_T = R₁ + R₂","1/R_T = 1/R₁ + 1/R₂","R_T = R₁ − R₂"],ans:1},
+];
+
+function physicsGen(count){
+  const topics=[
+    {q:"SI unit of {0} is",name:"force",unit:"Newton"},
+    {q:"SI unit of {0} is",name:"energy",unit:"Joule"},
+    {q:"SI unit of {0} is",name:"power",unit:"Watt"},
+    {q:"SI unit of {0} is",name:"pressure",unit:"Pascal"},
+    {q:"SI unit of {0} is",name:"charge",unit:"Coulomb"},
+    {q:"Formula for {0}",name:"speed",formula:"v = d/t"},
+    {q:"Formula for {0}",name:"acceleration",formula:"a = (v−u)/t"},
+    {q:"Formula for {0}",name:"density",formula:"ρ = m/V"},
+    {q:"Formula for {0}",name:"momentum",formula:"p = mv"},
+    {q:"Formula for {0}",name:"work",formula:"W = Fd"},
+  ];
+  const qs=[];
+  for(let i=0;i<count;i++){
+    const t=topics[i%topics.length];
+    if(t.unit){
+      qs.push({q:`${t.q.replace("{0}",t.name)}`,opts:[t.unit,"Kelvin","Mole","Candela"],ans:0});
+    } else {
+      qs.push({q:`${t.q.replace("{0}",t.name)}`,opts:[t.formula,"F=ma","E=mc²","P=IV"],ans:0});
+    }
+  }
+  return qs;
+}
+const physicsQuestions=[...physicsBase,...physicsGen(951)];
+
+// ---- CHEMISTRY ----
+const chemBase=[
+  {q:"Atomic number of Carbon",opts:["4","6","8","12"],ans:1},
+  {q:"Gas produced when Zn + dilute HCl",opts:["Oxygen","Hydrogen","Chlorine","Nitrogen"],ans:1},
+  {q:"pH of a neutral solution",opts:["0","7","14","10"],ans:1},
+  {q:"Valency of Nitrogen",opts:["2","3","4","5"],ans:1},
+  {q:"Which is an alkali metal?",opts:["Calcium","Sodium","Magnesium","Aluminium"],ans:1},
+  {q:"Chemical formula of water",opts:["H₂O₂","HO","H₂O","H₃O"],ans:2},
+  {q:"Avogadro's number",opts:["6.022×10²³","6.022×10²²","6.022×10²⁴","3.011×10²³"],ans:0},
+  {q:"Bond type in NaCl",opts:["Covalent","Ionic","Metallic","Hydrogen"],ans:1},
+  {q:"Separating crude oil fractions",opts:["Distillation","Filtration","Crystallization","Chromatography"],ans:0},
+  {q:"Oxidation state of S in H₂SO₄",opts:["+4","+6","+2","−2"],ans:1},
+  {q:"Which is a noble gas?",opts:["Nitrogen","Fluorine","Argon","Hydrogen"],ans:2},
+  {q:"IUPAC name of CH₃CH₂OH",opts:["Methanol","Ethanol","Propanol","Butanol"],ans:1},
+  {q:"Catalyst in Haber process",opts:["Platinum","Iron","Nickel","Vanadium pentoxide"],ans:1},
+  {q:"Molar mass of CO₂",opts:["28g/mol","44g/mol","32g/mol","22g/mol"],ans:1},
+  {q:"Electrolysis of brine produces",opts:["Cl₂, H₂, NaOH","HCl, H₂, NaOH","Cl₂, O₂, NaOH","Cl₂, H₂, Na"],ans:0},
+  {q:"Isotopes have same number of",opts:["Neutrons","Protons","Electrons+neutrons","Mass number"],ans:1},
+  {q:"Hybridization of carbon in CH₄",opts:["sp","sp²","sp³","dsp²"],ans:2},
+  {q:"A + B → AB is",opts:["Decomposition","Synthesis","Single displacement","Double displacement"],ans:1},
+  {q:"Charge on a proton",opts:["−1","+1","0","+2"],ans:1},
+  {q:"Boiling point of water at STP",opts:["90°C","95°C","100°C","105°C"],ans:2},
+  {q:"Gas that turns lime water milky",opts:["CO","CO₂","SO₂","NO₂"],ans:1},
+  {q:"Rate of reaction increased by",opts:["Decreasing temperature","Increasing temperature","Less catalyst","Lower concentration"],ans:1},
+  {q:"Molecular formula of benzene",opts:["C₆H₁₂","C₆H₆","C₆H₁₄","C₆H₈"],ans:1},
+  {q:"Metal liquid at room temperature",opts:["Gold","Mercury","Silver","Copper"],ans:1},
+  {q:"Adding oxygen or removing hydrogen is",opts:["Reduction","Oxidation","Neutralization","Hydrolysis"],ans:1},
+  {q:"Chemical symbol for Gold",opts:["Go","Gd","Au","Ag"],ans:2},
+  {q:"Acid turns blue litmus to",opts:["Red","Green","Yellow","Purple"],ans:0},
+  {q:"Electron shells in period 3 element",opts:["1","2","3","4"],ans:2},
+  {q:"Which is an ester?",opts:["CH₃COOH","CH₃COOC₂H₅","CH₃CHO","C₂H₅OH"],ans:1},
+  {q:"Soap is made by process of",opts:["Esterification","Saponification","Hydrogenation","Fermentation"],ans:1},
+  {q:"Gay-Lussac's law: gases combine in",opts:["Simple whole number volume ratios","Unpredictable ratios","Mass ratios","Mole ratios"],ans:0},
+  {q:"Indicator in acid-base titration",opts:["Iodine","Starch","Phenolphthalein","Methylene blue"],ans:2},
+  {q:"Electron config of Na (Z=11)",opts:["2,8,1","2,6,3","2,8,3","2,9,0"],ans:0},
+  {q:"Which is a homogeneous mixture?",opts:["Sand and water","Salt solution","Oil and water","Soil"],ans:1},
+  {q:"Formula of glucose",opts:["C₁₂H₂₂O₁₁","C₆H₁₂O₆","C₆H₁₀O₅","C₅H₁₀O₅"],ans:1},
+  {q:"Galvanizing: iron coated with",opts:["Tin","Zinc","Copper","Chromium"],ans:1},
+  {q:"Gas produced in photosynthesis",opts:["CO₂","CO","O₂","N₂"],ans:2},
+  {q:"Alkynes contain",opts:["Single bond","Double bond","Triple bond","Aromatic ring"],ans:2},
+  {q:"Contact process produces",opts:["HNO₃","H₂SO₄","HCl","H₃PO₄"],ans:1},
+  {q:"Molarity: 2 moles in 500mL",opts:["1M","2M","4M","0.5M"],ans:2},
+  {q:"Alkane general formula",opts:["CₙH₂ₙ","CₙH₂ₙ₊₂","CₙH₂ₙ₋₂","CₙHₙ"],ans:1},
+  {q:"Le Chatelier's principle: increasing pressure favors",opts:["More moles of gas","Fewer moles of gas","Endothermic direction","Neither side"],ans:1},
+  {q:"Catalyst in Contact process",opts:["Iron","Vanadium(V) oxide","Platinum","Nickel"],ans:1},
+  {q:"Number of electrons in neutral Mg (Z=12)",opts:["10","12","14","24"],ans:1},
+  {q:"Period in periodic table represents",opts:["Same valence electrons","Same number of electron shells","Same group","Same mass"],ans:1},
+  {q:"IUPAC name of CH₄",opts:["Ethane","Methane","Propane","Butane"],ans:1},
+  {q:"Radioactive decay: α particle is",opts:["Helium nucleus","Electron","Neutron","Proton"],ans:0},
+  {q:"Endothermic reaction",opts:["Releases heat","Absorbs heat","Has no energy change","Is always explosive"],ans:1},
+  {q:"Brown ring test detects",opts:["Chloride","Sulphate","Nitrate","Carbonate"],ans:2},
+  {q:"Colligative property depends on",opts:["Nature of solute","Number of solute particles","Color of solution","Temperature only"],ans:1},
+];
+
+const elements=[
+  ["H","Hydrogen","1"],["He","Helium","2"],["Li","Lithium","3"],["Be","Beryllium","4"],
+  ["B","Boron","5"],["C","Carbon","6"],["N","Nitrogen","7"],["O","Oxygen","8"],
+  ["F","Fluorine","9"],["Ne","Neon","10"],["Na","Sodium","11"],["Mg","Magnesium","12"],
+  ["Al","Aluminium","13"],["Si","Silicon","14"],["P","Phosphorus","15"],["S","Sulphur","16"],
+  ["Cl","Chlorine","17"],["Ar","Argon","18"],["K","Potassium","19"],["Ca","Calcium","20"],
+  ["Fe","Iron","26"],["Cu","Copper","29"],["Zn","Zinc","30"],["Ag","Silver","47"],
+  ["Au","Gold","79"],["Pb","Lead","82"],["Hg","Mercury","80"],["I","Iodine","53"],
+];
+
+function chemGen(count){
+  const qs=[];
+  for(let i=0;i<count;i++){
+    const e=elements[i%elements.length];
+    const t=i%4;
+    let q,opts,ans;
+    const n=parseInt(e[2]);
+    if(t===0){q=`Atomic number of ${e[1]}`;opts=[n+1,n-1,n,n+2].map(String);ans=2;}
+    else if(t===1){q=`Symbol for ${e[1]}`;opts=[e[0],"Xx","Yy","Zz"];ans=0;}
+    else if(t===2){q=`Element with symbol ${e[0]} is`;opts=[e[1],"Iron","Gold","Silver"];ans=0;}
+    else{q=`Number of protons in ${e[1]} (Z=${n})`;opts=[n,n+2,n-1,n+4].map(String);ans=0;}
+    qs.push({q,opts,ans});
+  }
+  return qs;
+}
+const chemQuestions=[...chemBase,...chemGen(951)];
+
+// ---- BIOLOGY ----
+const bioBase=[
+  {q:"Powerhouse of the cell",opts:["Nucleus","Mitochondria","Ribosome","Golgi body"],ans:1},
+  {q:"Photosynthesis takes place in",opts:["Mitochondria","Nucleus","Chloroplast","Vacuole"],ans:2},
+  {q:"DNA stands for",opts:["Deoxyribonucleic acid","Dioxyribonucleic acid","Deoxyribose nucleic acid","Diribonucleic acid"],ans:0},
+  {q:"Normal human cell chromosomes",opts:["23","46","48","44"],ans:1},
+  {q:"Plants make food by",opts:["Respiration","Photosynthesis","Digestion","Fermentation"],ans:1},
+  {q:"Universal blood donor type",opts:["A","B","AB","O"],ans:3},
+  {q:"Basic unit of life",opts:["Organ","Tissue","Cell","Organism"],ans:2},
+  {q:"Brain part controlling balance",opts:["Cerebrum","Cerebellum","Medulla","Hypothalamus"],ans:1},
+  {q:"Osmosis: water moves from",opts:["High to low concentration","Low to high solute concentration","High to low solute","Equal concentrations"],ans:1},
+  {q:"Enzyme that digests starch",opts:["Lipase","Protease","Amylase","Maltase"],ans:2},
+  {q:"Gas plants absorb in photosynthesis",opts:["O₂","N₂","CO₂","H₂"],ans:2},
+  {q:"Mendel's law of segregation: alleles",opts:["Combine randomly","Separate during gamete formation","Stay together","Blend"],ans:1},
+  {q:"Function of the kidney",opts:["Pumping blood","Filtering blood","Producing hormones","Digesting food"],ans:1},
+  {q:"Fungi belong to kingdom",opts:["Plantae","Animalia","Fungi","Protista"],ans:2},
+  {q:"Breaking down glucose for energy",opts:["Photosynthesis","Respiration","Transpiration","Digestion"],ans:1},
+  {q:"Insulin produced by",opts:["Liver","Kidney","Pancreas","Thyroid"],ans:2},
+  {q:"Recessive allele expressed when",opts:["Heterozygous","Homozygous dominant","Homozygous recessive","Both A and C"],ans:2},
+  {q:"Site of protein synthesis",opts:["Mitochondria","Ribosome","Nucleus","Golgi body"],ans:1},
+  {q:"Symbiosis benefiting both organisms",opts:["Parasitism","Commensalism","Mutualism","Competition"],ans:2},
+  {q:"Human heart chambers",opts:["2","3","4","5"],ans:2},
+  {q:"Transpiration: loss of water through",opts:["Roots","Stomata","Bark","Flowers"],ans:1},
+  {q:"Vitamin produced by skin in sunlight",opts:["Vitamin A","Vitamin B","Vitamin C","Vitamin D"],ans:3},
+  {q:"DNA replication occurs in",opts:["G1","S phase","G2","M phase"],ans:1},
+  {q:"Fight-or-flight hormone",opts:["Insulin","Adrenaline","Thyroxine","Glucagon"],ans:1},
+  {q:"Blood cells that fight infection",opts:["Red blood cells","Platelets","White blood cells","Plasma"],ans:2},
+  {q:"Meiosis produces cells with",opts:["Diploid","Haploid","Triploid","Tetraploid"],ans:1},
+  {q:"Structural unit of kidney",opts:["Alveolus","Nephron","Villus","Islet"],ans:1},
+  {q:"Decomposers are",opts:["Producers","Consumers","Bacteria and fungi","Parasites"],ans:2},
+  {q:"Resting potential of a neuron",opts:["+70mV","−70mV","0mV","+40mV"],ans:1},
+  {q:"Photoreceptors are in the",opts:["Cornea","Iris","Retina","Lens"],ans:2},
+  {q:"Hemoglobin contains",opts:["Copper","Zinc","Iron","Magnesium"],ans:2},
+  {q:"Organisms that make own food",opts:["Heterotrophs","Autotrophs","Saprotrophs","Omnivores"],ans:1},
+  {q:"Antigens on",opts:["Red blood cells","White blood cells","Plasma","Platelets"],ans:0},
+  {q:"Chromosome splitting occurs in",opts:["Prophase","Metaphase","Anaphase","Telophase"],ans:2},
+  {q:"Calvin cycle in which organelle part",opts:["Thylakoid","Grana","Stroma","Matrix"],ans:2},
+  {q:"Bile is produced by",opts:["Pancreas","Stomach","Liver","Gallbladder"],ans:2},
+  {q:"Building blocks of proteins",opts:["Nucleotides","Amino acids","Fatty acids","Monosaccharides"],ans:1},
+  {q:"Malaria caused by",opts:["Bacterium","Virus","Plasmodium","Fungi"],ans:2},
+  {q:"ABO blood grouping is",opts:["Incomplete dominance","Codominance","Epistasis","Linkage"],ans:1},
+  {q:"Role of myelin sheath",opts:["Produce impulses","Speed up transmission","Store neurotransmitters","Connect neurons"],ans:1},
+  {q:"Photosynthesis equation — products",opts:["CO₂ and H₂O","Glucose and O₂","O₂ only","ATP only"],ans:1},
+  {q:"Cell wall of plants made of",opts:["Chitin","Cellulose","Lignin","Collagen"],ans:1},
+  {q:"Aerobic respiration produces ATP in",opts:["Ribosome","Nucleus","Mitochondria","Vacuole"],ans:2},
+  {q:"Process of cell division: body cells",opts:["Meiosis","Mitosis","Binary fission","Budding"],ans:1},
+  {q:"Plasma membrane is",opts:["Fully permeable","Selectively permeable","Impermeable","Semi-rigid"],ans:1},
+  {q:"Largest organ in human body",opts:["Liver","Lung","Skin","Heart"],ans:2},
+  {q:"Function of red blood cells",opts:["Fight infection","Transport oxygen","Clot blood","Produce antibodies"],ans:1},
+  {q:"Which organelle has its own DNA?",opts:["Ribosome","Golgi body","Mitochondria","Vacuole"],ans:2},
+  {q:"Enzyme that breaks fats",opts:["Amylase","Protease","Lipase","Lactase"],ans:2},
+  {q:"Hormone controlling blood sugar",opts:["Adrenaline","Insulin","Thyroxine","Oestrogen"],ans:1},
+];
+
+function bioGen(count){
+  const facts=[
+    {org:"Nucleus",func:"DNA storage and cell control"},
+    {org:"Mitochondria",func:"ATP/energy production"},
+    {org:"Ribosome",func:"protein synthesis"},
+    {org:"Chloroplast",func:"photosynthesis"},
+    {org:"Golgi body",func:"packaging and secretion of proteins"},
+    {org:"Lysosome",func:"intracellular digestion"},
+    {org:"Endoplasmic reticulum",func:"transport of materials"},
+    {org:"Vacuole",func:"storage of water and nutrients"},
+    {org:"Centriole",func:"cell division"},
+    {org:"Cell membrane",func:"selective permeability"},
+  ];
+  const qs=[];
+  for(let i=0;i<count;i++){
+    const f=facts[i%facts.length];
+    const t=i%3;
+    let q,opts,ans;
+    if(t===0){q=`The ${f.org} is responsible for`;opts=[f.func,"Blood formation","Hormone production","Immunity"];ans=0;}
+    else if(t===1){q=`${f.func.charAt(0).toUpperCase()+f.func.slice(1)} occurs in the`;opts=[f.org,"Nucleus","Cytoplasm","Cell wall"];ans=0;}
+    else{q=`Which organelle is involved in ${f.func}?`;opts=[f.org,"Flagellum","Pinocytosis","Exocytosis"];ans=0;}
+    qs.push({q,opts,ans});
+  }
+  return qs;
+}
+const bioQuestions=[...bioBase,...bioGen(951)];
+
+const QUESTION_BANK={English:englishQuestions,Mathematics:mathQuestions,Physics:physicsQuestions,Chemistry:chemQuestions,Biology:bioQuestions};
+
+// ================================================================
+// READ MODE CONTENT
+// ================================================================
+const READ_TOPICS={
+  English:[
+    {title:"Parts of Speech",content:`English grammar is built on eight parts of speech.\n\n<strong>Nouns</strong> name people, places, things, or ideas (Lagos, teacher, freedom). <strong>Pronouns</strong> replace nouns (he, she, they, it). <strong>Verbs</strong> express action or state of being (run, is, seem). <strong>Adjectives</strong> modify nouns (beautiful, large). <strong>Adverbs</strong> modify verbs, adjectives, or other adverbs (quickly, very).\n\n<strong>Prepositions</strong> show relationships between words (in, on, under, beside). <strong>Conjunctions</strong> connect words or clauses (and, but, although, because). <strong>Interjections</strong> express emotion (Oh!, Wow!, Alas!).\n\nFor JAMB, you must be able to identify each part of speech in context, recognise gerunds (verbs acting as nouns), infinitives, and participles.`},
+    {title:"Tenses in English",content:`English has three main tenses: <strong>Present, Past</strong>, and <strong>Future</strong>, each with four aspects.\n\n<strong>Simple</strong> (I walk / I walked / I will walk) — general facts or completed actions.\n\n<strong>Continuous/Progressive</strong> (I am walking / I was walking / I will be walking) — ongoing actions at a specific time.\n\n<strong>Perfect</strong> (I have walked / I had walked / I will have walked) — links two time points.\n\n<strong>Perfect Continuous</strong> (I have been walking / I had been walking) — shows duration up to a point.\n\n<strong>JAMB Tips:</strong> Focus on subject-verb agreement, correct use of 'had' for past perfect, distinguishing simple past from present perfect, and the sequence of tenses in complex sentences.`},
+    {title:"Figures of Speech",content:`Figures of speech add depth and beauty to language.\n\n<strong>Simile</strong> — compares using 'like' or 'as' (brave as a lion).\n<strong>Metaphor</strong> — direct comparison (life is a journey).\n<strong>Personification</strong> — human qualities on non-human things (the sun smiled).\n<strong>Hyperbole</strong> — deliberate exaggeration (I've told you a million times).\n<strong>Irony</strong> — says one thing but means another.\n<strong>Oxymoron</strong> — contradictory words (sweet sorrow, deafening silence).\n<strong>Alliteration</strong> — repeated initial consonant sounds (Peter Piper picked).\n<strong>Onomatopoeia</strong> — words that imitate sounds (buzz, hiss, crash).\n<strong>Euphemism</strong> — milder word for something harsh (passed away = died).\n<strong>Antithesis</strong> — contrasting ideas in parallel structure.\n\n<strong>JAMB Tip:</strong> Always read the full sentence before identifying the figure of speech. Context is everything.`},
+    {title:"Comprehension Strategies",content:`JAMB comprehension passages test your ability to extract meaning, identify tone, and infer implied meanings.\n\n<strong>Step 1 — Skim</strong> the passage to get the main idea before reading questions.\n<strong>Step 2 — Read the questions</strong> carefully before a second read.\n<strong>Step 3 — Find evidence</strong> — always base answers on the passage, not external knowledge.\n\n<strong>Signal words to know:</strong>\n• 'However', 'but', 'yet' → contrast\n• 'Therefore', 'thus', 'hence' → result/conclusion\n• 'Furthermore', 'moreover', 'in addition' → addition\n• 'For instance', 'namely' → example\n\n<strong>Author's tone</strong> can be: critical, satirical, humorous, informative, argumentative, or nostalgic.\n\n<strong>Inference questions</strong> require reading between the lines — look for implied meanings, not stated facts.`},
+    {title:"Vocabulary Building",content:`JAMB tests vocabulary through synonyms, antonyms, and contextual usage.\n\n<strong>Root words:</strong>\n• 'bene' (good) → benevolent, beneficial\n• 'mal' (bad) → malevolent, malicious\n• 'port' (carry) → transport, import\n• 'cred' (believe) → incredible, credulous\n• 'dict' (say) → dictate, contradict\n\n<strong>Common Prefixes:</strong> un-, in-, dis-, mis-, pre-, re-, over-, under-, anti-, inter-\n\n<strong>Common Suffixes:</strong> -tion, -ness, -ful, -less, -ment, -ous, -ive, -ity, -ism, -ist\n\n<strong>Strategy:</strong> When you don't know a word, check if it has a positive or negative connotation — this alone eliminates options. Look at words before and after the unknown word for context clues.`},
+    {title:"Oral English & Phonetics",content:`JAMB tests phonetics through vowel sounds, consonants, stress patterns, and intonation.\n\n<strong>English has 44 sounds:</strong> 20 vowel sounds (12 monophthongs + 8 diphthongs) and 24 consonant sounds.\n\n<strong>Stress patterns:</strong>\n• Most 2-syllable nouns stress the FIRST syllable: PHOto, TAble, PENCil\n• Most 2-syllable verbs stress the SECOND syllable: reLAX, arRIVE, beLIEVE\n• Stress can shift: PHOtograph → phoTOgraphy → photoGRAPHic\n\n<strong>Common minimal pairs:</strong>\n• /p/ vs /b/ → pin/bin, pet/bet\n• /f/ vs /v/ → fan/van, safe/save\n• /θ/ vs /ð/ → thin/then, bath/bathe\n• /s/ vs /z/ → sip/zip, rice/rise\n\n<strong>Intonation:</strong> Rising tone for questions, falling tone for statements and commands.`},
+  ],
+  Mathematics:[
+    {title:"Algebra & Equations",content:`Algebra uses symbols (variables) to represent unknowns.\n\n<strong>Linear equations</strong> (degree 1): Solve by isolating the variable.\nExample: 3x − 7 = 14 → 3x = 21 → x = 7\n\n<strong>Quadratic equations</strong> (degree 2): Use factoring, completing the square, or the formula:\nx = (−b ± √(b²−4ac)) / 2a\n\n<strong>Factoring example:</strong>\nx² − 5x + 6 = (x−2)(x−3) = 0, so x = 2 or x = 3\n\n<strong>Simultaneous equations:</strong>\nSolve by substitution or elimination method.\n\n<strong>JAMB Tip:</strong> Always check your answer by substituting back into the original equation. Word problems require you to set up the equation first — identify the unknown carefully.`},
+    {title:"Trigonometry",content:`Trigonometry deals with relationships between angles and sides of triangles.\n\n<strong>Primary ratios (SOH-CAH-TOA):</strong>\n• Sin θ = Opposite/Hypotenuse\n• Cos θ = Adjacent/Hypotenuse\n• Tan θ = Opposite/Adjacent\n\n<strong>Common angles:</strong>\n• sin 30° = 0.5, cos 30° = √3/2, tan 30° = 1/√3\n• sin 45° = cos 45° = 1/√2, tan 45° = 1\n• sin 60° = √3/2, cos 60° = 0.5, tan 60° = √3\n• sin 90° = 1, cos 90° = 0\n\n<strong>Identities:</strong> sin²θ + cos²θ = 1\n\n<strong>Sine rule:</strong> a/sinA = b/sinB = c/sinC\n<strong>Cosine rule:</strong> c² = a² + b² − 2ab cosC\n\n<strong>JAMB Tip:</strong> Memorise the special angle values. Most JAMB trig questions use these exact values.`},
+    {title:"Statistics & Probability",content:`<strong>Measures of Central Tendency:</strong>\n• <strong>Mean</strong> = sum of all values ÷ number of values\n• <strong>Median</strong> = middle value when data is sorted (average of 2 middle values if n is even)\n• <strong>Mode</strong> = most frequently occurring value\n\n<strong>Measures of Spread:</strong>\n• Range = maximum − minimum\n• Standard deviation measures how spread data is from the mean\n\n<strong>Probability:</strong>\nP(event) = favourable outcomes ÷ total outcomes\nP ranges from 0 (impossible) to 1 (certain)\n\n<strong>Addition rule:</strong> P(A or B) = P(A) + P(B) − P(A and B)\n<strong>Independent events:</strong> P(A and B) = P(A) × P(B)\n\n<strong>Permutation</strong> (order matters): nPr = n!/(n−r)!\n<strong>Combination</strong> (order doesn't matter): nCr = n!/[r!(n−r)!]\n\n<strong>JAMB Tip:</strong> Frequency tables, cumulative frequency, and ogives are frequently tested.`},
+    {title:"Number Systems & Indices",content:`<strong>Number types:</strong>\n• Natural numbers: 1, 2, 3, ...\n• Integers: ..., −2, −1, 0, 1, 2, ...\n• Rational numbers: expressible as p/q (q ≠ 0)\n• Irrational: cannot be expressed as fractions (√2, π)\n\n<strong>Number bases:</strong>\n• Decimal (base 10): digits 0−9\n• Binary (base 2): digits 0, 1\n• Converting 1011₂ to decimal: 1×8 + 0×4 + 1×2 + 1×1 = 11\n\n<strong>Laws of Indices:</strong>\n• aⁿ × aᵐ = aⁿ⁺ᵐ\n• aⁿ / aᵐ = aⁿ⁻ᵐ\n• (aⁿ)ᵐ = aⁿᵐ\n• a⁰ = 1\n• a⁻ⁿ = 1/aⁿ\n• a^(1/n) = ⁿ√a\n\n<strong>Surds:</strong> √a × √b = √(ab), (√a + √b)(√a − √b) = a − b`},
+    {title:"Calculus",content:`<strong>Differentiation</strong> finds the rate of change (gradient).\n\n<strong>Key rules:</strong>\n• Power rule: d/dx(xⁿ) = nxⁿ⁻¹\n• Constant: d/dx(c) = 0\n• Sum rule: d/dx(f+g) = f' + g'\n• Chain rule: d/dx[f(g(x))] = f'(g(x)) · g'(x)\n\n<strong>Examples:</strong>\n• d/dx(3x²) = 6x\n• d/dx(5x³ − 2x + 7) = 15x² − 2\n\n<strong>Applications:</strong>\n• Gradient at a point: substitute x value into dy/dx\n• Maximum/minimum: set dy/dx = 0, then check d²y/dx²\n• Velocity = ds/dt, Acceleration = dv/dt\n\n<strong>Integration (antiderivative):</strong>\n∫xⁿ dx = xⁿ⁺¹/(n+1) + C (n ≠ −1)\n∫6x dx = 3x² + C\n\nDefinite integral gives the area under a curve.`},
+    {title:"Geometry & Mensuration",content:`<strong>Circle:</strong> Area = πr², Circumference = 2πr\nArc length = (θ/360) × 2πr, Sector area = (θ/360) × πr²\n\n<strong>Triangle:</strong> Area = ½ × base × height\nSum of angles = 180°. For right triangles: a² + b² = c²\n\n<strong>Quadrilaterals:</strong> Sum of interior angles = 360°\n• Rectangle: Area = L × W, Perimeter = 2(L+W)\n• Parallelogram: Area = base × height\n\n<strong>3D Shapes:</strong>\n• Cube: Volume = s³, Surface area = 6s²\n• Cylinder: Volume = πr²h, Curved SA = 2πrh\n• Cone: Volume = ⅓πr²h, Slant height = √(r²+h²)\n• Sphere: Volume = 4/3πr³, Surface area = 4πr²\n\n<strong>Angles on parallel lines:</strong>\n• Corresponding angles: equal\n• Alternate angles: equal\n• Co-interior angles: sum = 180°\n\n<strong>Common Pythagorean triples:</strong> (3,4,5), (5,12,13), (8,15,17)`},
+  ],
+  Physics:[
+    {title:"Mechanics & Motion",content:`<strong>Newton's Laws:</strong>\n• 1st Law (Inertia): Body remains at rest or uniform motion unless acted on by a net force.\n• 2nd Law: F = ma (force = mass × acceleration)\n• 3rd Law: Every action has an equal and opposite reaction.\n\n<strong>Equations of motion</strong> (constant acceleration):\n• v = u + at\n• s = ut + ½at²\n• v² = u² + 2as\n• s = ½(u+v)t\n\n<strong>Projectile motion:</strong> Horizontal component is constant; vertical component affected by g (9.8 m/s²).\n\n<strong>Work, Energy, Power:</strong>\n• W = Fd cosθ\n• KE = ½mv²\n• PE = mgh\n• Power = Work/time = Fv\n\n<strong>Conservation of Momentum:</strong> m₁u₁ + m₂u₂ = m₁v₁ + m₂v₂`},
+    {title:"Waves & Optics",content:`A <strong>wave</strong> transfers energy without transferring matter.\n\n<strong>Types:</strong>\n• Transverse: oscillation ⊥ to direction (light, water)\n• Longitudinal: oscillation ∥ to direction (sound)\n\n<strong>Wave equation:</strong> v = fλ (velocity = frequency × wavelength)\n\n<strong>Electromagnetic spectrum</strong> (increasing frequency):\nRadio → Microwave → Infrared → Visible → UV → X-rays → Gamma\n\n<strong>Reflection:</strong> angle of incidence = angle of reflection\n\n<strong>Refraction:</strong> Light bends when changing medium.\nRefractive index: n = c/v\nSnell's law: n₁sinθ₁ = n₂sinθ₂\n\n<strong>Critical angle:</strong> sinC = 1/n (for total internal reflection)\n\n<strong>Lenses:</strong>\n• Convex (converging): corrects hyperopia (long-sightedness)\n• Concave (diverging): corrects myopia (short-sightedness)\n• Lens formula: 1/f = 1/v − 1/u`},
+    {title:"Electricity & Magnetism",content:`<strong>Electric charge:</strong> Q = It (charge = current × time). Unit: Coulomb (C)\n\n<strong>Ohm's Law:</strong> V = IR (Voltage = Current × Resistance)\n\n<strong>Circuit rules:</strong>\n• Series: R_total = R₁ + R₂ + ... (same current throughout)\n• Parallel: 1/R_total = 1/R₁ + 1/R₂ (same voltage throughout)\n\n<strong>Electric power:</strong> P = IV = I²R = V²/R. Unit: Watt (W)\n\n<strong>Energy consumed:</strong> E = Pt (Joules or kWh)\n\n<strong>Capacitance:</strong> C = Q/V. Unit: Farad (F)\n• Capacitors in parallel: C_T = C₁ + C₂\n• Capacitors in series: 1/C_T = 1/C₁ + 1/C₂\n\n<strong>Magnetic force on current:</strong> F = BIL sinθ\n\n<strong>Electromagnetic induction:</strong> Faraday's law: EMF = −dΦ/dt\n\n<strong>Transformer:</strong> V_p/V_s = N_p/N_s = I_s/I_p`},
+    {title:"Thermodynamics",content:`<strong>Temperature scales:</strong>\n• Celsius (°C) ↔ Kelvin: K = °C + 273\n• Fahrenheit: °F = (9/5 × °C) + 32\n\n<strong>Heat transfer methods:</strong>\n• Conduction: through solids (requires contact)\n• Convection: through fluids (bulk movement)\n• Radiation: electromagnetic waves (no medium needed)\n\n<strong>Thermal expansion:</strong>\n• Linear: ΔL = αL₀ΔT\n• Volume: ΔV = γV₀ΔT\n\n<strong>Gas laws:</strong>\n• Boyle's: PV = constant (constant T)\n• Charles': V/T = constant (constant P)\n• Gay-Lussac's: P/T = constant (constant V)\n• Combined: PV/T = constant\n• Ideal gas: PV = nRT\n\n<strong>Specific heat capacity:</strong> Q = mcΔT\n<strong>Latent heat:</strong> Q = mL (during phase change — no temp change)`},
+    {title:"Modern Physics",content:`<strong>Photoelectric effect:</strong>\nLight hitting a metal surface ejects electrons if frequency ≥ threshold (f₀).\nEinstein's equation: E = hf (h = 6.63×10⁻³⁴ Js)\nWork function: φ = hf₀\nMaximum KE of electron: ½mv²_max = hf − φ\n\n<strong>Bohr's atomic model:</strong>\nElectrons orbit in fixed energy levels (shells).\nEnergy emitted when electrons fall to lower levels produces line spectra.\nEnergy of photon: E = hf = E_higher − E_lower\n\n<strong>Radioactivity:</strong>\n• Alpha (α): helium nucleus (high ionization, low penetration)\n• Beta (β): electron or positron\n• Gamma (γ): electromagnetic radiation (highest penetration)\n\n<strong>Half-life:</strong> Time for half the atoms to decay.\nN = N₀ × (1/2)^(t/T½)\n\n<strong>Mass-energy equivalence:</strong> E = mc²\n• Fission: splits heavy nuclei\n• Fusion: combines light nuclei (powers the sun)`},
+    {title:"Pressure & Fluids",content:`<strong>Pressure:</strong> P = F/A (Force per unit Area). SI unit: Pascal (Pa)\n\n<strong>Pressure in fluids:</strong> P = ρgh\n(ρ = density, g = 9.8 m/s², h = depth)\n\n<strong>Pascal's Principle:</strong> Pressure applied to an enclosed fluid transmits equally in all directions. (Hydraulic machines)\n\n<strong>Archimedes' Principle:</strong> A body immersed in fluid experiences upthrust equal to the weight of displaced fluid.\nUpthrust U = ρVg\nA body floats if Upthrust ≥ its weight.\n\n<strong>Atmospheric pressure:</strong>\n~101,325 Pa at sea level. Measured by a barometer.\n1 atm = 760 mmHg = 101,325 Pa\n\n<strong>Bernoulli's Principle:</strong> Faster-moving fluid has lower pressure.\nApplications: aircraft wings, spray guns, venturi tubes.\n\n<strong>Viscosity:</strong> Internal friction in fluids. Decreases with temperature in liquids.`},
+  ],
+  Chemistry:[
+    {title:"Atomic Structure",content:`An atom has a <strong>nucleus</strong> (protons + neutrons) surrounded by <strong>electrons</strong> in shells.\n\n<strong>Proton number (Z)</strong> = atomic number = protons = electrons (neutral atom)\n<strong>Mass number (A)</strong> = protons + neutrons\n<strong>Neutron number</strong> = A − Z\n\n<strong>Isotopes:</strong> Same Z, different A (same element, different neutrons). Example: ¹²C and ¹⁴C\n\n<strong>Electronic configuration:</strong>\n• Shell 1: max 2 electrons\n• Shell 2: max 8 electrons\n• Shell 3: max 18 (fills to 8 before shell 4 fills)\n\nExamples: Na (Z=11) = 2,8,1 | Cl (Z=17) = 2,8,7\n\n<strong>Valence electrons</strong> determine chemical behavior.\n\n<strong>Periodic Table:</strong>\n• Groups: same valence electrons, similar properties\n• Periods: same number of electron shells\n• Metallic character decreases across a period; increases down a group`},
+    {title:"Chemical Bonding",content:`<strong>Ionic bonding:</strong> Transfer of electrons from metal to non-metal.\n• Metal loses e⁻ → cation (+)\n• Non-metal gains e⁻ → anion (−)\nElectrostatic attraction holds them. Examples: NaCl, MgO, CaCl₂\nProperties: high melting point, conducts electricity when molten/dissolved.\n\n<strong>Covalent bonding:</strong> Sharing of electrons between non-metals.\n• Single bond (1 pair): H₂, HCl, H₂O\n• Double bond (2 pairs): O₂, CO₂, C₂H₄\n• Triple bond (3 pairs): N₂, C₂H₂\nProperties: lower melting point, poor conductors.\n\n<strong>Metallic bonding:</strong> Metal atoms release electrons into a 'sea' of delocalised electrons. Explains electrical conductivity and malleability.\n\n<strong>Hydrogen bonding:</strong> Attraction between δ+ H and δ- N, O, or F atoms. Explains high boiling point of water (100°C).`},
+    {title:"Organic Chemistry",content:`Organic chemistry = carbon compound chemistry.\n\n<strong>Homologous series:</strong>\n\n<strong>Alkanes</strong> (CₙH₂ₙ₊₂): Single bonds, relatively unreactive.\nMethane (CH₄), Ethane (C₂H₆), Propane (C₃H₈), Butane (C₄H₁₀)\n\n<strong>Alkenes</strong> (CₙH₂ₙ): C=C double bond, undergo addition reactions.\nEthene (C₂H₄), Propene (C₃H₆)\n\n<strong>Alkynes</strong> (CₙH₂ₙ₋₂): C≡C triple bond.\nEthyne/acetylene (C₂H₂)\n\n<strong>Alcohols</strong> (−OH): Ethanol (C₂H₅OH) — fuel, antiseptic.\n\n<strong>Carboxylic acids</strong> (−COOH): Ethanoic acid (CH₃COOH) — vinegar.\n\n<strong>Esters</strong>: Formed from acid + alcohol. Used in perfumes, food flavoring.\nEsterification: RCOOH + ROH → RCOOR' + H₂O (in presence of H₂SO₄)\n\n<strong>Saponification:</strong> Ester + NaOH → soap + glycerol.\n<strong>Petroleum:</strong> Mixture of hydrocarbons separated by fractional distillation.`},
+    {title:"Acids, Bases & Salts",content:`<strong>Definitions:</strong>\n• Arrhenius: Acid → H⁺ in water; Base → OH⁻ in water\n• Brønsted-Lowry: Acid = proton donor; Base = proton acceptor\n\n<strong>pH scale:</strong> 0−14\n• pH < 7: acidic\n• pH = 7: neutral\n• pH > 7: basic/alkaline\npH = −log[H⁺]\n\n<strong>Strong acids:</strong> HCl, H₂SO₄, HNO₃ (fully ionise)\n<strong>Weak acids:</strong> CH₃COOH (partially ionise)\n\n<strong>Neutralisation:</strong> Acid + Base → Salt + Water\nHCl + NaOH → NaCl + H₂O\n\n<strong>Indicators:</strong>\n• Litmus: red in acid, blue in base\n• Phenolphthalein: colourless in acid, pink in base\n• Universal indicator: shows full pH range\n\n<strong>Solubility rules:</strong>\n• All nitrates, Na, K, NH₄⁺ salts: soluble\n• Carbonates (except Na, K, NH₄⁺): insoluble\n• Sulphates (except Ba, Pb): soluble\n• Chlorides (except Ag, Pb): soluble`},
+    {title:"Rates of Reaction",content:`<strong>Rate of reaction</strong> = change in concentration ÷ time\n\n<strong>Factors affecting rate:</strong>\n1. <strong>Concentration</strong> — higher → more frequent collisions → faster\n2. <strong>Temperature</strong> — higher → more kinetic energy → faster (10°C rise ≈ doubles rate)\n3. <strong>Catalyst</strong> — provides alternative pathway with lower activation energy\n4. <strong>Surface area</strong> — more surface → more collisions → faster\n5. <strong>Pressure</strong> — for gases, higher pressure → faster\n\n<strong>Collision theory:</strong> Particles must collide with sufficient energy (≥ activation energy) AND correct orientation.\n\n<strong>Le Chatelier's Principle:</strong> A system at equilibrium adjusts to oppose disturbances.\n• Increase pressure → shifts to side with fewer moles of gas\n• Increase temperature → shifts in endothermic direction\n• Remove product → forward reaction favoured\n\n<strong>Haber process:</strong> N₂ + 3H₂ ⇌ 2NH₃\nConditions: Iron catalyst, 450°C, 200 atm — a commercial compromise.`},
+    {title:"Electrochemistry",content:`<strong>Electrolysis</strong> uses electricity to drive non-spontaneous chemical reactions.\n\n<strong>Key terms:</strong>\n• <strong>Cathode</strong> (negative electrode): Reduction occurs (cations gain electrons)\n• <strong>Anode</strong> (positive electrode): Oxidation occurs (anions lose electrons)\n• <strong>Electrolyte:</strong> Solution/melt that conducts electricity by ion movement\n\n<strong>Electrolysis of brine (NaCl solution):</strong>\n• Cathode: 2H⁺ + 2e⁻ → H₂↑\n• Anode: 2Cl⁻ → Cl₂↑ + 2e⁻\n• Solution: NaOH remains\n\n<strong>Electrolysis of dilute H₂SO₄ (water):</strong>\n• Cathode: H₂\n• Anode: O₂ (ratio 2:1)\n\n<strong>Faraday's Laws:</strong>\n1st: Mass deposited ∝ quantity of electricity (Q = It)\n2nd: Masses of different substances by same charge ∝ equivalent masses\n\n<strong>Electroplating:</strong> Article as cathode, plating metal as anode, salt solution of metal as electrolyte.`},
+  ],
+  Biology:[
+    {title:"Cell Biology",content:`The <strong>cell</strong> is the fundamental unit of life.\n\n<strong>Prokaryotic cells</strong> (bacteria): No membrane-bound nucleus, no membrane-bound organelles. Smaller, simpler.\n\n<strong>Eukaryotic cells</strong> (plants, animals, fungi, protists): Membrane-bound nucleus, complex organelles.\n\n<strong>Key organelles:</strong>\n• <strong>Nucleus</strong> — contains DNA, controls cell activities\n• <strong>Mitochondria</strong> — ATP production via aerobic respiration; "powerhouse of the cell"\n• <strong>Chloroplasts</strong> — photosynthesis (in plant cells only)\n• <strong>Ribosome</strong> — protein synthesis (rough ER has ribosomes; smooth ER synthesises lipids)\n• <strong>Golgi apparatus</strong> — modifies and packages proteins for secretion\n• <strong>Lysosomes</strong> — contain digestive enzymes; break down waste\n• <strong>Vacuole</strong> — water/nutrient storage (large central vacuole in plants)\n\n<strong>Plant cells only:</strong> Cell wall (cellulose), chloroplasts, large central vacuole\n<strong>Animal cells only:</strong> Centrioles, lysosomes`},
+    {title:"Genetics & Heredity",content:`<strong>DNA</strong> (deoxyribonucleic acid) carries genetic information.\nBase pairs: Adenine−Thymine (A−T), Guanine−Cytosine (G−C)\n\n<strong>Gene</strong> = segment of DNA coding for one protein.\n<strong>Chromosome</strong> = condensed DNA + proteins. Humans: 46 (23 pairs).\n\n<strong>Mendel's Laws:</strong>\n• Law of Segregation: alleles separate during gamete formation\n• Law of Independent Assortment: genes on different chromosomes sort independently\n\n<strong>Key terms:</strong>\n• Dominant allele (A): expressed in both AA and Aa genotypes\n• Recessive allele (a): expressed only in aa genotype\n• Genotype: genetic makeup (AA, Aa, aa)\n• Phenotype: observable trait\n• Heterozygous: two different alleles (Aa)\n• Homozygous: two same alleles (AA or aa)\n\n<strong>Codominance:</strong> Both alleles fully expressed in heterozygote.\nExample: ABO blood groups — AB genotype shows both A and B antigens.\n\n<strong>Sex determination:</strong> XX = female; XY = male.\nSex-linked traits (e.g., haemophilia, colour blindness) are carried on X chromosome.`},
+    {title:"Ecology",content:`<strong>Ecology</strong> = the study of organisms and their relationships with the environment.\n\n<strong>Levels of organisation:</strong>\nIndividual → Population → Community → Ecosystem → Biosphere\n\n<strong>Food chain:</strong> Shows energy flow from producers to consumers.\nProducer → Primary consumer → Secondary consumer → Tertiary consumer\n\n<strong>Energy loss:</strong> ~90% is lost as heat at each trophic level (10% rule).\n\n<strong>Ecological relationships:</strong>\n• <strong>Mutualism:</strong> both species benefit (e.g., bees and flowers)\n• <strong>Commensalism:</strong> one benefits, other unaffected\n• <strong>Parasitism:</strong> one benefits (parasite), other harmed (host)\n• <strong>Predation:</strong> predator kills and eats prey\n• <strong>Competition:</strong> organisms compete for same resources\n\n<strong>Nutrient cycles:</strong>\n• Carbon cycle: Photosynthesis (CO₂ → organic matter); Respiration/Combustion (→ CO₂)\n• Nitrogen cycle: N₂ → Nitrogen fixation → Nitrates → Plant uptake → Decomposition → Denitrification → N₂\n\n<strong>Biotic factors:</strong> Living components. <strong>Abiotic factors:</strong> Non-living (temperature, light, water, soil pH).`},
+    {title:"Human Physiology",content:`<strong>Digestive system:</strong>\nMouth (amylase breaks starch) → Oesophagus → Stomach (pepsin breaks protein; HCl kills bacteria) → Small intestine (final digestion; absorption via villi) → Large intestine (water absorption) → Rectum → Anus\n\n<strong>Circulatory system:</strong>\nDouble circulation: Pulmonary (heart→lungs→heart) and Systemic (heart→body→heart).\nArteries (carry blood away from heart); Veins (carry blood to heart); Capillaries (exchange).\nRBC: carry O₂ via haemoglobin. WBC: immune defense. Platelets: clotting.\n\n<strong>Respiratory system:</strong>\nAir → Trachea → Bronchi → Bronchioles → Alveoli\nGas exchange at alveoli: O₂ into blood, CO₂ out.\nInspiration: diaphragm contracts + ribs rise → thoracic cavity expands\n\n<strong>Excretory system:</strong>\nKidney filters blood. Nephron = functional unit.\nUrine formation: Filtration → Selective reabsorption → Secretion → Urine\n\n<strong>Nervous system:</strong>\nCNS (brain + spinal cord) and PNS.\nNeuron → Synapse → Neurotransmitter release → Receptor`},
+    {title:"Photosynthesis & Respiration",content:`<strong>Photosynthesis equation:</strong>\n6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂\nOccurs in chloroplasts.\n\n<strong>Light reactions</strong> (Thylakoid membrane):\nLight energy splits water (photolysis): 2H₂O → 4H⁺ + 4e⁻ + O₂\nProduces: O₂, ATP, NADPH\n\n<strong>Calvin cycle / Dark reactions</strong> (Stroma):\nCO₂ fixed using ATP and NADPH to produce glucose (G3P → glucose).\n\n<strong>Factors affecting photosynthesis rate:</strong> Light intensity, CO₂ concentration, temperature, water availability, chlorophyll amount.\n\n<strong>Aerobic respiration:</strong>\nC₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 38 ATP\nStages: Glycolysis (cytoplasm, 2 ATP) → Krebs cycle (matrix, 2 ATP) → ETC (inner membrane, 34 ATP)\n\n<strong>Anaerobic respiration:</strong>\n• Animals: Glucose → Lactic acid + 2 ATP (causes muscle fatigue)\n• Yeast/plants: Glucose → Ethanol + CO₂ + 2 ATP (fermentation)\nMuch less efficient than aerobic (2 ATP vs 38 ATP).`},
+    {title:"Evolution & Classification",content:`<strong>Darwin's Theory of Natural Selection:</strong>\n1. Variation exists within populations\n2. Organisms produce more offspring than can survive\n3. Organisms with favourable traits survive and reproduce ('survival of the fittest')\n4. Favourable traits are inherited\n5. Over generations, populations change (evolve)\n\n<strong>Evidence for evolution:</strong>\n• Fossil record — shows progression of life\n• Comparative anatomy — homologous structures (e.g., human arm, whale flipper, bat wing)\n• Biogeography — similar species in geographically related areas\n• Molecular biology — similar DNA sequences in related organisms\n\n<strong>Classification hierarchy (mnemonic: King Philip Came Over For Good Soup):</strong>\nKingdom → Phylum → Class → Order → Family → Genus → Species\n\n<strong>Five Kingdoms:</strong> Monera, Protista, Fungi, Plantae, Animalia\n\n<strong>Binomial nomenclature:</strong> Two-part Latin name (Genus species).\nExample: Homo sapiens (humans), Canis lupus (wolf)\n\n<strong>Viruses:</strong> Not cells — no organelles, reproduce only inside host cells, acellular.`},
+  ],
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let currentSubject=null;
+let currentQuestions=[];
+let currentQIndex=0;
+let answers={};
+let timerInterval=null;
+let timeLeft=1800;
+let results=[];
+let stats={};
+let readSubject=null;
+let readTopicIndex=null;
+let histTab='hist';
+
+// Load from localStorage
+function loadData(){
+  try{
+    const r=localStorage.getItem('jamb_results');
+    if(r) results=JSON.parse(r);
+    const s=localStorage.getItem('jamb_stats');
+    if(s) stats=JSON.parse(s);
+  }catch(e){}
+}
+function saveResults(){try{localStorage.setItem('jamb_results',JSON.stringify(results));}catch(e){}}
+function saveStats(){try{localStorage.setItem('jamb_stats',JSON.stringify(stats));}catch(e){}}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showHome(){
+  clearTimer();
+  renderHome();
+  showScreen('home');
+}
+function showHistory(){renderHistory();showScreen('history');}
+function showRead(){renderReadSubjects();showScreen('read');}
+function showReadTopic(subj){readSubject=subj;readTopicIndex=null;renderReadTopic();showScreen('readtopic');}
+
+// ================================================================
+// UTILITIES
+// ================================================================
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function gradeColor(g){return{A:"#22c55e",B:"#84cc16",C:"#eab308",D:"#f97316",F:"#ef4444"}[g]||"#9ca3af";}
+function calcGrade(pct){return pct>=90?"A":pct>=70?"B":pct>=50?"C":pct>=40?"D":"F";}
+function fmtTime(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+function el(id){return document.getElementById(id);}
+
+// ================================================================
+// HOME
+// ================================================================
+function renderHome(){
+  const totalAttempts=Object.values(stats).reduce((a,s)=>a+(s.attempts||0),0);
+  const overallAvg=totalAttempts>0?Math.round(Object.values(stats).reduce((a,s)=>a+(s.totalScore||0),0)/totalAttempts):0;
+
+  const statsRow=el('home-stats');
+  if(totalAttempts>0){
+    statsRow.style.display='flex';
+    statsRow.innerHTML=`
+      <div class="stat-box"><div class="stat-val">${totalAttempts}</div><div class="stat-lbl">Total Attempts</div></div>
+      <div class="stat-box"><div class="stat-val">${overallAvg}%</div><div class="stat-lbl">Overall Avg</div></div>
+      <div class="stat-box"><div class="stat-val">${results.length}</div><div class="stat-lbl">Results Saved</div></div>
+    `;
+  }
+
+  const list=el('subject-list');
+  list.innerHTML=SUBJECTS.map(s=>{
+    const st=stats[s];
+    const avg=st?Math.round(st.totalScore/st.attempts):0;
+    const col=avg>=50?'#22c55e':'#ef4444';
+    const bankSize=QUESTION_BANK[s].length;
+    return `<div class="card subj-card" onclick="goSubject('${s}')">
+      <span class="subj-emoji">${EMOJIS[s]}</span>
+      <div class="subj-info">
+        <div class="subj-name">${s}</div>
+        <div class="subj-meta">${bankSize}+ questions in bank${st?` · ${st.attempts} attempt${st.attempts!==1?'s':''}`:'  · Not attempted'}</div>
+        ${st?`<div class="progress-bar"><div class="progress-fill" style="width:${avg}%;background:${col}"></div></div>`:''}
+      </div>
+      ${st?`<div class="subj-score"><div class="subj-score-val" style="color:${col}">${avg}%</div><div class="subj-score-lbl">avg</div></div>`:''}
+      <span class="subj-arrow">›</span>
+    </div>`;
+  }).join('');
+}
+
+function goSubject(subj){
+  currentSubject=subj;
+  const st=stats[subj];
+  const avg=st?Math.round(st.totalScore/st.attempts):0;
+  el('subj-nav-title').textContent='/ '+subj;
+  el('subj-emoji').textContent=EMOJIS[subj];
+  el('subj-title').textContent=subj;
+  el('subj-bank-info').textContent=QUESTION_BANK[subj].length+'+ questions in bank · 50 per session';
+  if(st){
+    el('subj-stats-cards').style.display='grid';
+    el('subj-stats-cards').innerHTML=`
+      <div class="card metric"><div class="metric-val" style="color:var(--blue3)">${st.attempts}</div><div class="metric-lbl">Attempts</div></div>
+      <div class="card metric"><div class="metric-val" style="color:var(--green)">${st.best}%</div><div class="metric-lbl">Best Score</div></div>
+      <div class="card metric"><div class="metric-val" style="color:${avg>=50?'var(--green)':'var(--red)'}">${avg}%</div><div class="metric-lbl">Average</div></div>
+    `;
+  } else {
+    el('subj-stats-cards').style.display='none';
+    el('subj-stats-cards').innerHTML='';
+  }
+  showScreen('subject');
+}
+
+// ================================================================
+// QUIZ
+// ================================================================
+function startQuiz(){
+  currentQuestions=shuffle(QUESTION_BANK[currentSubject]).slice(0,50);
+  currentQIndex=0;
+  answers={};
+  timeLeft=1800;
+  el('quiz-subj-label').textContent='📚 '+currentSubject;
+  clearTimer();
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    updateTimerUI();
+    if(timeLeft<=0){clearTimer();doFinish();}
+  },1000);
+  renderQuestion();
+  showScreen('quiz');
+}
+
+function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+
+function updateTimerUI(){
+  const t=el('quiz-timer');
+  t.textContent='⏱ '+fmtTime(timeLeft);
+  if(timeLeft<300){t.className='timer warn';}
+  else{t.className='timer ok';}
+  const pct=(timeLeft/1800)*100;
+  el('qprog-t').style.width=pct+'%';
+  el('qprog-t').style.background=timeLeft<300?'var(--red)':'var(--green)';
+}
+
+function renderQuestion(){
+  const q=currentQuestions[currentQIndex];
+  const total=currentQuestions.length;
+  const answered=Object.keys(answers).length;
+  const userAns=answers[currentQIndex];
+  const showAns=userAns!==undefined;
+
+  el('quiz-qnum').textContent='Q'+(currentQIndex+1)+'/'+total;
+  el('q-number-label').textContent='QUESTION '+(currentQIndex+1)+' OF '+total;
+  el('q-text').textContent=q.q;
+  el('quiz-answered').textContent=answered+' answered';
+  el('qprog-q').style.width=(((currentQIndex+1)/total)*100)+'%';
+
+  const labels=['A','B','C','D'];
+  el('q-options').innerHTML=q.opts.map((opt,i)=>{
+    let cls='opt';
+    let icon='';
+    if(showAns){
+      cls+=' locked';
+      if(i===q.ans){cls+=' selected-correct';icon='<span class="opt-icon">✓</span>';}
+      else if(i===userAns&&i!==q.ans){cls+=' selected-wrong';icon='<span class="opt-icon">✗</span>';}
+    }
+    return `<div class="${cls}" onclick="selectOpt(${i})">
+      <span class="opt-label">${labels[i]}</span>
+      <span class="opt-text">${opt}</span>
+      ${icon}
+    </div>`;
+  }).join('');
+
+  const fb=el('q-feedback');
+  if(showAns){
+    fb.style.display='block';
+    if(userAns===q.ans){
+      fb.textContent='✅ Correct! Well done.';
+      fb.style.borderColor='var(--green)';fb.style.background='rgba(34,197,94,.08)';fb.style.color='var(--green)';
+    } else {
+      fb.textContent=`❌ Incorrect. Correct answer: ${labels[q.ans]}. ${q.opts[q.ans]}`;
+      fb.style.borderColor='var(--red)';fb.style.background='rgba(239,68,68,.08)';fb.style.color='#fca5a5';
+    }
+  } else {
+    fb.style.display='none';
+  }
+
+  el('btn-prev').disabled=currentQIndex===0;
+  el('btn-prev').style.opacity=currentQIndex===0?'0.4':'1';
+  el('btn-next').textContent=currentQIndex===total-1?'Finish →':'Next →';
+
+  renderGrid();
+  updateTimerUI();
+}
+
+function renderGrid(){
+  const total=currentQuestions.length;
+  el('grid-nav').innerHTML=Array.from({length:total},(_,i)=>{
+    let cls='grid-cell';
+    if(i===currentQIndex) cls+=' current';
+    else if(answers[i]!==undefined) cls+=' answered';
+    return `<div class="${cls}" onclick="jumpTo(${i})">${i+1}</div>`;
+  }).join('');
+}
+
+function selectOpt(i){
+  if(answers[currentQIndex]!==undefined) return;
+  answers[currentQIndex]=i;
+  renderQuestion();
+}
+
+function nextQ(){
+  if(currentQIndex<currentQuestions.length-1){currentQIndex++;renderQuestion();}
+  else{confirmFinish();}
+}
+function prevQ(){if(currentQIndex>0){currentQIndex--;renderQuestion();}}
+function jumpTo(i){currentQIndex=i;renderQuestion();}
+
+function confirmFinish(){
+  const answered=Object.keys(answers).length;
+  const unanswered=currentQuestions.length-answered;
+  if(unanswered>0){
+    if(!confirm(`You have ${unanswered} unanswered question${unanswered!==1?'s':''}. Submit anyway?`)) return;
+  }
+  clearTimer();
+  doFinish();
+}
+
+function doFinish(){
+  const score=currentQuestions.reduce((acc,q,i)=>acc+(answers[i]===q.ans?1:0),0);
+  const total=currentQuestions.length;
+  const pct=Math.round((score/total)*100);
+  const grade=calcGrade(pct);
+
+  const result={
+    id:Date.now(),
+    subject:currentSubject,
+    score,total,pct,grade,
+    date:new Date().toLocaleString(),
+  };
+  results.unshift(result);
+  if(results.length>200) results=results.slice(0,200);
+  saveResults();
+
+  if(!stats[currentSubject]) stats[currentSubject]={attempts:0,totalScore:0,best:0};
+  stats[currentSubject].attempts++;
+  stats[currentSubject].totalScore+=pct;
+  stats[currentSubject].best=Math.max(stats[currentSubject].best,pct);
+  saveStats();
+
+  renderResult(result);
+  showScreen('result');
+}
+
+// ================================================================
+// RESULT
+// ================================================================
+function renderResult(r){
+  el('result-emoji').textContent=r.pct>=50?'🎉':'📚';
+  el('result-grade').textContent=r.grade;
+  el('result-grade').style.color=gradeColor(r.grade);
+  el('result-pct').textContent=r.pct+'%';
+  el('result-pct').style.color=r.pct>=50?'var(--green)':'var(--red)';
+  el('result-label').textContent=`${r.score} / ${r.total} correct · ${r.subject}`;
+  el('result-status').textContent=r.pct>=50?'✅ PASSED':'❌ FAILED — Keep practicing!';
+  el('result-status').style.color=r.pct>=50?'var(--green)':'var(--red)';
+  el('r-correct').textContent=r.score;
+  el('r-wrong').textContent=r.total-r.score;
+  el('r-skip').textContent=r.total-Object.keys(answers).length;
+  el('review-section').style.display='none';
+  el('review-toggle-btn').textContent='▼ Review Wrong Answers ('+(r.total-r.score)+')';
+}
+
+let reviewOpen=false;
+function toggleReview(){
+  reviewOpen=!reviewOpen;
+  const sec=el('review-section');
+  if(reviewOpen){
+    sec.style.display='block';
+    const labels=['A','B','C','D'];
+    const wrongItems=currentQuestions.map((q,i)=>({q,i})).filter(({q,i})=>answers[i]!==q.ans);
+    sec.innerHTML=wrongItems.length===0?'<div class="empty"><div class="empty-icon">🎉</div><div>No wrong answers!</div></div>':
+      wrongItems.map(({q,i})=>`<div class="review-item">
+        <div class="review-q"><span style="color:var(--dim);font-size:.78rem">Q${i+1}. </span>${q.q}</div>
+        ${q.opts.map((o,oi)=>`<div class="review-opt ${oi===q.ans?'correct':oi===answers[i]?'wrong':'neutral'}">
+          ${labels[oi]}. ${o} ${oi===q.ans?' ✓ Correct answer':oi===answers[i]?' ✗ Your answer':''}
+        </div>`).join('')}
+      </div>`).join('');
+    el('review-toggle-btn').textContent='▲ Hide Review';
+  } else {
+    sec.style.display='none';
+    el('review-toggle-btn').textContent='▼ Review Wrong Answers';
+  }
+}
+
+function retryQuiz(){currentQIndex=0;answers={};startQuiz();}
+
+// ================================================================
+// HISTORY
+// ================================================================
+function switchTab(tab){
+  histTab=tab;
+  el('tab-hist').className='tab-btn'+(tab==='hist'?' active':'');
+  el('tab-stats').className='tab-btn'+(tab==='stats'?' active':'');
+  el('hist-panel').style.display=tab==='hist'?'block':'none';
+  el('stats-panel').style.display=tab==='stats'?'block':'none';
+}
+
+function renderHistory(){
+  switchTab('hist');
+  // History panel
+  const hp=el('hist-panel');
+  if(results.length===0){
+    hp.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div>No history yet. Start a practice session!</div></div>';
+  } else {
+    hp.innerHTML=results.map(r=>`<div class="card hist-item">
+      <div><div class="hist-subj">${EMOJIS[r.subject]} ${r.subject}</div><div class="hist-date">${r.date}</div></div>
+      <div class="hist-grade" style="color:${gradeColor(r.grade)}">${r.grade}</div>
+      <div><div class="hist-pct" style="color:${r.pct>=50?'var(--green)':'var(--red)'}">${r.pct}%</div>
+        <div class="hist-result" style="color:${r.pct>=50?'var(--green)':'var(--red)'}">${r.pct>=50?'PASS':'FAIL'}</div>
+      </div>
+    </div>`).join('');
+  }
+  // Stats panel
+  const sp=el('stats-panel');
+  const subjsWithStats=Object.keys(stats);
+  if(subjsWithStats.length===0){
+    sp.innerHTML='<div class="empty"><div class="empty-icon">📈</div><div>No statistics yet!</div></div>';
+  } else {
+    sp.innerHTML=subjsWithStats.map(subj=>{
+      const s=stats[subj];
+      const avg=Math.round(s.totalScore/s.attempts);
+      const col=avg>=50?'var(--green)':'var(--red)';
+      return `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div class="stat-card-subj">${EMOJIS[subj]} ${subj}</div>
+          <div style="text-align:right"><div style="font-size:1.5rem;font-weight:900;color:${col}">${avg}%</div><div style="font-size:.68rem;color:var(--dim)">average</div></div>
+        </div>
+        <div class="stat-mini-grid">
+          <div><div class="stat-mini-lbl">Attempts</div><div class="stat-mini-val">${s.attempts}</div></div>
+          <div><div class="stat-mini-lbl">Best</div><div class="stat-mini-val">${s.best}%</div></div>
+          <div><div class="stat-mini-lbl">Average</div><div class="stat-mini-val">${avg}%</div></div>
+        </div>
+        <div class="progress-bar" style="height:8px">
+          <div class="progress-fill" style="width:${avg}%;background:linear-gradient(90deg,var(--blue),${col})"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ================================================================
+// READ MODE
+// ================================================================
+function renderReadSubjects(){
+  const descriptions={
+    English:"Grammar, vocabulary, figures of speech, comprehension strategies",
+    Mathematics:"Algebra, calculus, geometry, statistics, number theory",
+    Physics:"Mechanics, waves, electricity, thermodynamics, modern physics",
+    Chemistry:"Atomic structure, organic chemistry, electrochemistry, kinetics",
+    Biology:"Cell biology, genetics, ecology, physiology, evolution",
+  };
+  el('read-subject-list').innerHTML=SUBJECTS.map(s=>`
+    <div class="card read-subj-card" onclick="showReadTopic('${s}')">
+      <span style="font-size:2.5rem">${EMOJIS[s]}</span>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:1.05rem">${s}</div>
+        <div style="font-size:.83rem;color:var(--muted);margin-top:2px">${descriptions[s]}</div>
+        <div class="read-topics-count">${READ_TOPICS[s].length} topics available</div>
+      </div>
+      <span style="color:var(--blue3);font-size:1.5rem">›</span>
+    </div>`).join('');
+}
+
+function renderReadTopic(){
+  el('read-nav-subj').textContent=readSubject;
+  const topics=READ_TOPICS[readSubject]||[];
+  el('read-topic-list').innerHTML=topics.map((t,i)=>`
+    <button class="read-topic-btn ${readTopicIndex===i?'active':''}" onclick="openTopic(${i})">${t.title}</button>
+  `).join('');
+  el('read-placeholder').style.display=readTopicIndex===null?'block':'none';
+  el('read-card').style.display=readTopicIndex!==null?'block':'none';
+  if(readTopicIndex!==null) showTopicContent(readTopicIndex);
+}
+
+function openTopic(i){
+  readTopicIndex=i;
+  document.querySelectorAll('.read-topic-btn').forEach((b,idx)=>{
+    b.className='read-topic-btn'+(idx===i?' active':'');
+  });
+  el('read-placeholder').style.display='none';
+  el('read-card').style.display='block';
+  showTopicContent(i);
+}
+
+function showTopicContent(i){
+  const topics=READ_TOPICS[readSubject]||[];
+  const t=topics[i];
+  el('read-card-title').textContent=t.title;
+  el('read-card-body').innerHTML=t.content.split('\n').map(line=>{
+    if(!line.trim()) return '';
+    return '<p>'+line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')+'</p>';
+  }).join('');
+  el('read-page-info').textContent=(i+1)+' / '+topics.length;
+  el('btn-read-prev').disabled=i===0;
+  el('btn-read-prev').style.opacity=i===0?'0.4':'1';
+  el('btn-read-next').disabled=i===topics.length-1;
+  el('btn-read-next').style.opacity=i===topics.length-1?'0.4':'1';
+  window.scrollTo(0,0);
+}
+
+function prevTopic(){if(readTopicIndex>0){openTopic(readTopicIndex-1);}}
+function nextTopic(){const t=READ_TOPICS[readSubject]||[];if(readTopicIndex<t.length-1){openTopic(readTopicIndex+1);}}
+
+// ================================================================
+// INIT
+// ================================================================
+loadData();
+renderHome();
+</script>
+</body>
+</html>
